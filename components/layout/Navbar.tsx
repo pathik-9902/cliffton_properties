@@ -28,13 +28,6 @@ const NAV_ITEMS: NavItem[] = [
     ],
   },
   {
-    label: 'Industrial',
-    children: [
-      { label: 'Rent', href: '/properties/industrial/listing/rent' },
-      { label: 'Sale', href: '/properties/industrial/listing/sale' },
-    ],
-  },
-  {
     label: 'Land',
     children: [
       { label: 'Rent', href: '/properties/land/listing/rent' },
