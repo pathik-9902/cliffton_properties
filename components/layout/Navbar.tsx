@@ -12,37 +12,40 @@ type NavItem = {
 const NAV_ITEMS: NavItem[] = [
   { label: 'Home', href: '/' },
   { label: 'About Us', href: '/about' },
+
   {
     label: 'Residential',
     children: [
-      { label: 'Rent', href: '/residential/rent' },
-      { label: 'Sale', href: '/residential/sale' },
+      { label: 'Rent', href: '/properties/residential/listing/rent' },
+      { label: 'Sale', href: '/properties/residential/listing/sale' },
     ],
   },
   {
     label: 'Commercial',
     children: [
-      { label: 'Rent', href: '/commercial/rent' },
-      { label: 'Sale', href: '/commercial/sale' },
+      { label: 'Rent', href: '/properties/commercial/listing/rent' },
+      { label: 'Sale', href: '/properties/commercial/listing/sale' },
     ],
   },
   {
     label: 'Industrial',
     children: [
-      { label: 'Rent', href: '/industrial/rent' },
-      { label: 'Sale', href: '/industrial/sale' },
+      { label: 'Rent', href: '/properties/industrial/listing/rent' },
+      { label: 'Sale', href: '/properties/industrial/listing/sale' },
     ],
   },
   {
     label: 'Land',
     children: [
-      { label: 'Rent', href: '/land/rent' },
-      { label: 'Sale', href: '/land/sale' },
+      { label: 'Rent', href: '/properties/land/listing/rent' },
+      { label: 'Sale', href: '/properties/land/listing/sale' },
     ],
   },
-  { label: 'Want to List', href: '/list-page' },
+
+  { label: 'Want to List', href: '/want-to-list' },
   { label: 'Contact Us', href: '/contact' },
 ];
+
 
 export default function Navbar() {
   const [openMenu, setOpenMenu] = useState<string | null>(null);

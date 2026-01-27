@@ -8,95 +8,50 @@ root
 │  │
 │  ├─ about
 │  │  └─ page.tsx
-│  │
 │  ├─ contact
 │  │  └─ page.tsx
-│  │
 │  ├─ want-to-list
 │  │  └─ page.tsx
 │  │
 │  ├─ properties
 │  │  ├─ [category]
 │  │  │  ├─ page.tsx                # Category landing
-│  │  │  ├─ rent
-│  │  │  │  └─ page.tsx
-│  │  │  ├─ sale
+│  │  │  ├─ rent/sale
 │  │  │  │  └─ page.tsx
 │  │  │  └─ [id]
 │  │  │     └─ page.tsx              # Property detail
-│  │
-│  ├─ admin
-│  │  ├─ layout.tsx                  # Admin shell + auth guard
-│  │  ├─ login
-│  │  │  └─ page.tsx
-│  │  │
-│  │  ├─ dashboard
-│  │  │  └─ page.tsx
-│  │  │
-│  │  ├─ properties
-│  │  │  ├─ page.tsx                 # Property list
-│  │  │  ├─ new
-│  │  │  │  └─ page.tsx              # Add property
-│  │  │  └─ [id]
-│  │  │     └─ edit
-│  │  │        └─ page.tsx
-│  │  │
-│  │  └─ leads
-│  │     └─ page.tsx
-│  │
-│  └─ api
+│  └─api
 │     ├─ properties
-│     │  └─ route.ts
+│     |  └─ route.ts
 │     ├─ leads
-│     │  └─ route.ts
-│     └─ admin
-│        └─ auth
-│           └─ route.ts
-│
+│        └─ route.ts
 ├─ components
-│  ├─ navbar
-│  │  ├─ Navbar.tsx
-│  │  └─ MobileMenu.tsx
-│  │
-│  ├─ admin
-│  │  ├─ AdminSidebar.tsx
-│  │  ├─ AdminHeader.tsx
-│  │  └─ AdminGuard.tsx
-│  │
 │  ├─ property
-│  │  ├─ PropertyCard.tsx
-│  │  ├─ PropertyGrid.tsx
-│  │  └─ PropertyFilters.tsx
-│  │
-│  ├─ forms
-│  │  ├─ PropertyForm.tsx
-│  │  ├─ ContactForm.tsx
-│  │  └─ WantToListForm.tsx
-│  │
-│  └─ ui
-│     ├─ Button.tsx
-│     ├─ Input.tsx
-│     ├─ Select.tsx
-│     ├─ Modal.tsx
-│     └─ Loader.tsx
+│     ├─ PropertyCard.tsx
+│     ├─ PropertyGrid.tsx
+│     └─ PropertyFilters.tsx
 │
 ├─ lib
 │  ├─ supabase
 │  │  ├─ client.ts                  # Browser client
 │  │  ├─ server.ts                  # Server client
-│  │  └─ admin.ts                   # Admin-only operations
 │  │
-│  ├─ auth.ts                       # Admin allowlist logic
 │  ├─ constants.ts                  # Categories, enums
 │  ├─ validations.ts                # Zod schemas
 │  └─ utils.ts
 │
 ├─ types
-│  ├─ property.ts
-│  └─ common.ts
-│
-├─ public
-   ├─ images
-   ├─ icons
-   └─ manifest.json                 # PWA support
+   ├─ property.ts
+   └─ common.ts
 
+git add .
+git commit -m "Changes"
+git push
+rm -rf .next
+
+clear
+npm run dev
+
+
+
+VickyPatel@0821
