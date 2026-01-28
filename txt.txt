@@ -1,48 +1,57 @@
-root
+cliffton_properties/
+├── app/
+│   ├── about/
+│   │   └── page.tsx
+│   │
+│   ├── api/
+│   │   ├── contact/
+│   │   │   └── route.ts
+│   │   │
+│   │   └── properties/
+│   │       └── route.ts
+│   │
+│   ├── contact/
+│   │   └── page.tsx
+│   │
+│   ├── properties/
+│   │   ├── [category]/
+│   │   │   └── listing/
+│   │   │       └── [type]/
+│   │   │           └── page.tsx
+│   │   │
+│   │   └── detail/
+│   │       └── [id]/
+│   │           └── page.tsx
+│   │
+│   ├── want-to-list/
+│   │   └── page.tsx
+│   │
+│   ├── layout.tsx
+│   ├── page.tsx
+│   └── globals.css
 │
-├─ app
-│  ├─ layout.tsx
-│  ├─ page.tsx                      # Home
-│  ├─ globals.css
-│  ├─ not-found.tsx
-│  │
-│  ├─ about
-│  │  └─ page.tsx
-│  ├─ contact
-│  │  └─ page.tsx
-│  ├─ want-to-list
-│  │  └─ page.tsx
-│  │
-│  ├─ properties
-│  │  ├─ [category]
-│  │  │  ├─ page.tsx                # Category landing
-│  │  │  ├─ rent/sale
-│  │  │  │  └─ page.tsx
-│  │  │  └─ [id]
-│  │  │     └─ page.tsx              # Property detail
-│  └─api
-│     ├─ properties
-│     |  └─ route.ts
-│     ├─ leads
-│        └─ route.ts
-├─ components
-│  ├─ property
-│     ├─ PropertyCard.tsx
-│     ├─ PropertyGrid.tsx
-│     └─ PropertyFilters.tsx
+├── components/
+│   ├── layout/
+│   │   ├── Navbar.tsx
+│   │   └── Footer.tsx
+│   │
+│   ├── property/
+│   │   └── PropertyCard.tsx
+│   │
+│   └── Carousel.tsx
 │
-├─ lib
-│  ├─ supabase
-│  │  ├─ client.ts                  # Browser client
-│  │  ├─ server.ts                  # Server client
-│  │
-│  ├─ constants.ts                  # Categories, enums
-│  ├─ validations.ts                # Zod schemas
-│  └─ utils.ts
+├── lib/
+│   └── (shared utilities, future APIs)
 │
-├─ types
-   ├─ property.ts
-   └─ common.ts
+├── public/
+│   └── placeholder.png
+│
+├── types/
+│   └── property.ts
+│
+├── data.json
+└── .env.local
+
 
 git add .
 git commit -m "Changes"
@@ -51,7 +60,3 @@ rm -rf .next
 
 clear
 npm run dev
-
-
-
-VickyPatel@0821
