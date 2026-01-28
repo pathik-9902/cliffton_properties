@@ -1,7 +1,7 @@
 import PropertyCard from '@/components/property/PropertyCard';
 import { FullPropertyDetails } from '@/types/property';
 
-type Props = {
+type PageProps = {
   params: Promise<{
     category: string;
     type: string;
@@ -13,7 +13,7 @@ async function getProperties(
   type: string
 ): Promise<FullPropertyDetails[]> {
   const baseUrl =
-    process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000';
 
   const res = await fetch(
     `${baseUrl}/api/properties?category=${category}&type=${type}`,
@@ -24,11 +24,11 @@ async function getProperties(
     throw new Error('Failed to fetch properties');
   }
 
-  const json = await res.json();
-  return json.data ?? [];
+  const { data } = await res.json();
+  return data ?? [];
 }
 
-export default async function ListingPage({ params }: Props) {
+export default async function ListingPage({ params }: PageProps) {
   // ✅ REQUIRED IN NEXT 14
   const { category, type } = await params;
 

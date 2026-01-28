@@ -18,31 +18,33 @@ export interface Property {
   city: string;
   area?: string;
   price: number;
-  price_unit: string;
-  maintenance_charges: number;
-  built_up_area: number;
-  area_unit: string;
+
+  views_count?: number;
+  enquiries_count?: number;
   created_at: string;
   updated_at: string;
 }
 
 export interface ResidentialProperty {
-  bedrooms: number;
+  property_subtype: string;
+  bedrooms: number; maintenance_charges: number;
+  built_up_area: number;
   bathrooms: number;
   balconies: number;
-  furnishing_type: FurnishingType;
-  floor_number: number;
-  total_floors: number;
+  furnishing_type: string;
+  floor: string;
   parking_spaces: number;
   lift: boolean;
   property_age: number;
+  carpet_area: number;
+  amenity?: string;
 }
 
 export interface CommercialProperty {
   commercial_subtype: string;
-  floor_number: number;
-  total_floors: number;
-  washrooms: number;
+  floor: string;
+  washrooms: number; maintenance_charges: number;
+  built_up_area: number;
   pantry: boolean;
   meeting_rooms: number;
   central_air_conditioning: boolean;
@@ -52,7 +54,9 @@ export interface CommercialProperty {
 }
 
 export interface LandProperty {
+  land_subtype: string;
   plot_area: number;
+  price_per_unit: number;
   plot_dimensions?: string;
   road_width?: number;
   corner_plot: boolean;
@@ -68,8 +72,13 @@ export interface PropertyImage {
 }
 
 export type FullPropertyDetails = Property & {
-  residential?: ResidentialProperty;
-  commercial?: CommercialProperty;
-  land?: LandProperty;
+  residential_details?: ResidentialProperty;
+  commercial_details?: CommercialProperty;
+  land_details?: LandProperty;
   images?: PropertyImage[];
 };
+
+// Interface for the root response object
+export interface PropertyResponse {
+  properties: FullPropertyDetails[];
+}
