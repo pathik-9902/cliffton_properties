@@ -66,6 +66,8 @@ export default function PropertyCard({ property }: PropertyCardProps) {
           src={coverImage}
           alt={title}
           fill
+          loading="eager"
+          priority
           sizes="(max-width: 768px) 100vw, 33vw"
           className="object-cover transition-transform duration-700 group-hover:scale-110"
         />
