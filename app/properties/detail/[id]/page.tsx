@@ -14,11 +14,13 @@ import {
   LandPlot,
   Eye,
   MessageSquare,
+  PhoneCall,
+  Calendar,
 } from 'lucide-react';
 import ImageCarousel from '@/components/Carousel';
 import { FullPropertyDetails } from '@/types/property';
 
-/* ---------------- HELPERS ---------------- */
+/* ================= HELPERS ================= */
 
 const formatINR = (amount: number) =>
   new Intl.NumberFormat('en-IN', {
@@ -56,7 +58,7 @@ export default function PropertyDetailPage({ params }: Props) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F3E6D7]">
+      <div className="min-h-screen flex items-center justify-center bg-[#F4EFE9]">
         <div className="flex flex-col items-center gap-4">
           <div className="h-12 w-12 rounded-full border-4 border-black/20 border-t-black animate-spin" />
           <p className="text-xs tracking-widest uppercase text-black/60">
@@ -73,19 +75,21 @@ export default function PropertyDetailPage({ params }: Props) {
   const comm = property.commercial_details;
   const land = property.land_details;
 
-  // Unit Logic: Agricultural Land = acres, Plot/Others = sqft
   const isAgriLand = land?.land_subtype?.toLowerCase().includes('agricultural');
   const areaUnit = isAgriLand ? 'acres' : 'sqft';
-      const areaValue = isAgriLand ? land?.plot_area : (resi?.built_up_area || comm?.built_up_area);
+  const areaValue = isAgriLand
+    ? land?.plot_area
+    : resi?.built_up_area || comm?.built_up_area;
 
   return (
-    <main className="min-h-screen bg-[#F3E6D7] pb-24">
+    <main className="bg-[#F4EFE9] pb-24">
       {/* ================= HERO ================= */}
-      <section className="pt-10">
+      <section className="pt-8">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="bg-white rounded-[32px] shadow-2xl overflow-hidden relative">
+          <div className="relative rounded-[36px] overflow-hidden shadow-2xl bg-white">
             <ImageCarousel images={property.images ?? []} title={property.title} />
 
+            {/* BADGES */}
             <div className="absolute top-6 left-6 flex gap-3 z-10">
               {property.is_featured && (
                 <span className="bg-[#C9A24D] text-black text-[11px] font-extrabold px-5 py-1 rounded-full tracking-widest">
@@ -102,12 +106,10 @@ export default function PropertyDetailPage({ params }: Props) {
 
       {/* ================= CONTENT ================= */}
       <section className="max-w-7xl mx-auto px-4 mt-14 grid grid-cols-1 lg:grid-cols-3 gap-10">
-        
         {/* ================= LEFT ================= */}
         <div className="lg:col-span-2 space-y-10">
-
-          {/* HEADER */}
-          <div className="bg-white p-8 rounded-[32px] shadow-lg">
+          {/* ================= HEADER ================= */}
+          <div className="bg-white rounded-[32px] p-8 shadow-lg">
             <div className="flex flex-col md:flex-row md:justify-between gap-6">
               <div>
                 <span className="inline-flex items-center gap-2 bg-black/5 px-4 py-1 rounded-full text-[10px] tracking-widest uppercase font-bold mb-4">
@@ -117,167 +119,134 @@ export default function PropertyDetailPage({ params }: Props) {
                   {property.category}
                 </span>
 
-                <h1 className="text-4xl font-serif font-semibold text-black">
+                <h1 className="text-3xl sm:text-4xl font-serif font-semibold text-black leading-tight">
                   {property.title}
                 </h1>
 
-                <div className="mt-3 flex flex-wrap items-center gap-4 text-black/60 text-sm">
+                <div className="mt-4 flex flex-wrap items-center gap-4 text-black/60 text-sm">
                   <span className="flex items-center gap-2">
                     <MapPin className="w-4 h-4" />
                     {property.area}, {property.city}
                   </span>
-                  <span className="flex items-center gap-1.5 border-l pl-4">
-                    <Eye size={14} /> {property.views_count ?? 0}
+                  <span className="flex items-center gap-2">
+                    <Eye size={14} /> {property.views_count ?? 0} Views
                   </span>
-                  <span className="flex items-center gap-1.5">
-                    <MessageSquare size={14} /> {property.enquiries_count ?? 0}
+                  <span className="flex items-center gap-2">
+                    <MessageSquare size={14} /> {property.enquiries_count ?? 0} Enquiries
                   </span>
                 </div>
               </div>
 
+              {/* PRICE */}
               <div className="md:text-right">
                 <p className="text-4xl font-black text-black">
                   {formatINR(property.price)}
                 </p>
-                <p className="text-xs tracking-[0.35em] uppercase text-black/50 mt-1">
-                  {property.listing_type === 'rent' ? 'PER MONTH' : 'TOTAL PRICE'}
+                <p className="text-xs tracking-[0.3em] uppercase text-black/50 mt-1">
+                  {property.listing_type === 'rent' ? 'Per Month' : 'Total Price'}
                 </p>
               </div>
             </div>
 
             {/* QUICK STATS */}
-            <div className="mt-10 pt-8 border-t flex flex-wrap gap-4">
-              <QuickStat 
-                label={isAgriLand ? "Plot Area" : "Built-up Area"} 
-                value={`${areaValue} ${areaUnit}`} 
-                icon={<Ruler size={16} />} 
-              />
-              <QuickStat label="Listing Type" value={property.listing_type} icon={<Tag size={16} />} />
-              <QuickStat label="Property Code" value={property.property_code} icon={<Key size={16} />} />
-   
+            <div className="mt-10 grid grid-cols-2 sm:grid-cols-3 gap-4">
+              <Stat label={isAgriLand ? 'Plot Area' : 'Built-up Area'} value={`${areaValue} ${areaUnit}`} icon={<Ruler size={16} />} />
+              <Stat label="Listing Type" value={property.listing_type} icon={<Tag size={16} />} />
+              <Stat label="Property Code" value={property.property_code} icon={<Key size={16} />} />
             </div>
           </div>
 
-          {/* SPECIFICATIONS */}
-          <div className="bg-white p-8 rounded-[32px] shadow-lg">
-            <h2 className="text-2xl font-serif font-semibold mb-8">
-              Property Specifications
-            </h2>
-
+          {/* ================= SPECIFICATIONS ================= */}
+          <Section title="Property Specifications">
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
-              {/* ================= RESIDENTIAL ================= */}
               {resi && (
                 <>
-                  <DetailCell label="Property Type" value={resi.property_subtype} />
-                  <DetailCell label="Bedrooms" value={resi.bedrooms} />
-                  <DetailCell label="Bathrooms" value={resi.bathrooms} />
-                  <DetailCell label="Floor" value={resi.floor} />
-                  <DetailCell label="Furnishing" value={resi.furnishing_type.replace('_', ' ')} />
-                  <DetailCell label="Parking" value={`${resi.parking_spaces} Slots`} />
-                  <DetailCell label="Property Age" value={`${resi.property_age} Years`} />
-                  <DetailCell label="Balconies" value={resi.balconies} />
-                  <DetailCell label="Lift" value={resi.lift ? 'Available' : 'Not Available'} />
-                  <DetailCell label="Carpet Area" value={`${resi.carpet_area} sqft`} />
-                  <DetailCell label="Key Amenity" value={resi.amenity} />
-                             {resi.maintenance_charges > 0 && (
-                <QuickStat label="Maintenance" value={`₹${resi.maintenance_charges}/mo`} icon={<ShieldCheck size={16} />} />
-              )}
+                  <Spec label="Type" value={resi.property_subtype} />
+                  <Spec label="Bedrooms" value={resi.bedrooms} />
+                  <Spec label="Bathrooms" value={resi.bathrooms} />
+                  <Spec label="Furnishing" value={resi.furnishing_type.replace('_', ' ')} />
+                  <Spec label="Carpet Area" value={`${resi.carpet_area} sqft`} />
+                  <Spec label="Parking" value={`${resi.parking_spaces} Slots`} />
+                  <Spec label="Balconies" value={resi.balconies} />
+                  <Spec label="Lift" value={resi.lift ? 'Available' : 'Not Available'} />
                 </>
               )}
 
-              {/* ================= COMMERCIAL ================= */}
               {comm && (
                 <>
-                  <DetailCell label="Commercial Type" value={comm.commercial_subtype} />
-                  <DetailCell label="Floor (Unit/Total)" value={comm.floor} />
-                  <DetailCell label="Washrooms" value={comm.washrooms} />
-                  <DetailCell label="Meeting Rooms" value={comm.meeting_rooms} />
-                  <DetailCell label="Pantry" value={comm.pantry ? 'Available' : 'Not Available'} />
-                  <DetailCell label="Air Conditioning" value={comm.central_air_conditioning ? 'Centralized' : 'Non-AC'} />
-                  <DetailCell label="Passenger Lift" value={comm.passenger_lift ? 'Yes' : 'No'} />
-                  <DetailCell label="Service Lift" value={comm.service_lift ? 'Yes' : 'No'} />
-                  <DetailCell label="Frontage Width" value={`${comm.frontage_width} ft`} />
-                             {comm.maintenance_charges > 0 && (
-                <QuickStat label="Maintenance" value={`₹${comm.maintenance_charges}/mo`} icon={<ShieldCheck size={16} />} />
-              )}
+                  <Spec label="Type" value={comm.commercial_subtype} />
+                  <Spec label="Washrooms" value={comm.washrooms} />
+                  <Spec label="Meeting Rooms" value={comm.meeting_rooms} />
+                  <Spec label="Pantry" value={comm.pantry ? 'Yes' : 'No'} />
+                  <Spec label="AC" value={comm.central_air_conditioning ? 'Centralized' : 'Non-AC'} />
+                  <Spec label="Frontage" value={`${comm.frontage_width} ft`} />
                 </>
               )}
 
-              {/* ================= LAND ================= */}
               {land && (
                 <>
-                  <DetailCell label="Land Subtype" value={land.land_subtype} />
-                  <DetailCell label="Plot Area" value={`${land.plot_area} ${areaUnit}`} />
-                  <DetailCell label="Dimensions" value={land.plot_dimensions} />
-                  <DetailCell label="Zoning" value={land.land_zoning} />
-                  <DetailCell label="Approved Use" value={land.approved_use} />
-                  <DetailCell label="Road Width" value={`${land.road_width} ft`} />
-                  <DetailCell label="Corner Plot" value={land.corner_plot ? 'Yes' : 'No'} />
-                  <DetailCell label="Boundary Wall" value={land.boundary_wall ? 'Constructed' : 'Not Constructed'} />
+                  <Spec label="Subtype" value={land.land_subtype} />
+                  <Spec label="Plot Area" value={`${land.plot_area} ${areaUnit}`} />
+                  <Spec label="Dimensions" value={land.plot_dimensions} />
+                  <Spec label="Road Width" value={`${land.road_width} ft`} />
+                  <Spec label="Corner Plot" value={land.corner_plot ? 'Yes' : 'No'} />
+                  <Spec label="Boundary Wall" value={land.boundary_wall ? 'Yes' : 'No'} />
                 </>
               )}
             </div>
-          </div>
+          </Section>
 
-          {/* DESCRIPTION */}
-          <div className="bg-white p-8 rounded-[32px] shadow-lg">
-            <div className="w-16 h-[2px] bg-[#C9A24D] mb-6" />
-            <h2 className="text-2xl font-serif font-semibold mb-4">Description</h2>
+          {/* ================= DESCRIPTION ================= */}
+          <Section title="Description">
             <p className="text-[15px] leading-8 text-black/70 whitespace-pre-line">
               {property.description}
             </p>
 
-            <div className="mt-8 pt-6 border-t flex flex-col md:flex-row justify-between gap-4 text-sm text-black/50">
+            <div className="mt-8 pt-6 border-t flex flex-col sm:flex-row justify-between gap-4 text-sm text-black/50">
               <div className="flex items-center gap-2">
                 <Clock size={14} />
                 Last Updated: {new Date(property.updated_at).toLocaleDateString('en-IN')}
               </div>
               <p>
-                Available from:{' '}
+                Available From:{' '}
                 <span className="font-semibold text-black">
                   {property.possession_date || 'Immediate'}
                 </span>
               </p>
             </div>
-          </div>
+          </Section>
         </div>
 
-        {/* ================= RIGHT ================= */}
+        {/* ================= RIGHT / CTA ================= */}
         <div className="lg:col-span-1">
           <div className="sticky top-10 space-y-6">
-            <div className="bg-black rounded-[32px] p-8 text-white shadow-2xl">
-              <h3 className="text-xl font-serif mb-8 text-[#C9A24D]">Interested?</h3>
+            <div className="bg-black text-white rounded-[32px] p-8 shadow-2xl">
+              <h3 className="text-xl font-serif text-[#C9A24D] mb-8">
+                Interested in this property?
+              </h3>
+
               <div className="space-y-4">
-                <button className="w-full bg-[#C9A24D] text-black py-4 rounded-full font-bold tracking-wide hover:bg-[#b38f42] transition-colors">
-                  Contact Agent
+                <button className="w-full bg-[#C9A24D] text-black py-4 rounded-full font-bold flex items-center justify-center gap-2 hover:bg-[#b38f42] transition">
+                  <PhoneCall size={18} /> Contact Agent
                 </button>
-                <button className="w-full border border-white/30 py-4 rounded-full font-semibold hover:bg-white/10 transition-colors">
-                  Request a Tour
+
+                <button className="w-full border border-white/30 py-4 rounded-full font-semibold flex items-center justify-center gap-2 hover:bg-white/10 transition">
+                  <Calendar size={18} /> Schedule Visit
                 </button>
               </div>
+            </div>
 
-              <div className="mt-10 pt-8 border-t border-white/20 flex items-center gap-4">
-                <div className="w-12 h-12 bg-[#C9A24D] rounded-full flex items-center justify-center text-black font-bold">
-                  {property.city.charAt(0)}
+            {property.verified && (
+              <div className="bg-white rounded-[24px] p-6 shadow-lg flex items-center gap-4">
+                <div className="w-12 h-12 bg-[#C9A24D] rounded-xl flex items-center justify-center">
+                  <ShieldCheck className="text-black" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold">Property Manager</p>
-                  <p className="text-xs text-white/60">Response time &lt; 2 hours</p>
+                  <p className="font-bold text-sm">Verified Listing</p>
+                  <p className="text-xs text-black/50">Checked & authenticated</p>
                 </div>
               </div>
-            </div>
-
-            <div className="bg-white p-6 rounded-[32px] shadow-lg flex items-center gap-4">
-              <div className="w-12 h-12 bg-[#C9A24D] rounded-xl flex items-center justify-center">
-                <ShieldCheck className="text-black" size={22} />
-              </div>
-              <div>
-                <p className="font-bold text-sm">Verified Listing</p>
-                <p className="text-xs text-black/60">
-                  Listed on {new Date(property.created_at).toLocaleDateString()}
-                </p>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </section>
@@ -285,27 +254,49 @@ export default function PropertyDetailPage({ params }: Props) {
   );
 }
 
-/* ================= SMALL COMPONENTS ================= */
+/* ================= UI COMPONENTS ================= */
 
-function QuickStat({ label, value, icon }: { label: string; value: string | number; icon: React.ReactNode }) {
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-3 bg-black/5 px-5 py-3 rounded-full">
+    <div className="bg-white rounded-[32px] p-8 shadow-lg">
+      <h2 className="text-2xl font-serif font-semibold mb-6">{title}</h2>
+      {children}
+    </div>
+  );
+}
+
+function Stat({
+  label,
+  value,
+  icon,
+}: {
+  label: string;
+  value: string | number;
+  icon: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-center gap-3 bg-black/5 px-5 py-4 rounded-2xl">
       {icon}
       <div>
-        <p className="text-[9px] tracking-widest uppercase font-bold text-black/50">{label}</p>
+        <p className="text-[10px] tracking-widest uppercase font-bold text-black/50">
+          {label}
+        </p>
         <p className="text-sm font-semibold text-black">{value}</p>
       </div>
     </div>
   );
 }
 
-function DetailCell({ label, value }: { label: string; value: string | number | undefined | null }) {
-  if (value === undefined || value === null || value === '') return null;
-
+function Spec({ label, value }: { label: string; value: string | number | null | undefined }) {
+  if (!value) return null;
   return (
     <div className="bg-black/5 p-5 rounded-2xl">
-      <p className="text-[10px] tracking-widest uppercase text-black/50 mb-1">{label}</p>
-      <p className="text-sm font-semibold text-black capitalize">{value.toString()}</p>
+      <p className="text-[10px] tracking-widest uppercase text-black/50 mb-1">
+        {label}
+      </p>
+      <p className="text-sm font-semibold text-black capitalize">
+        {value.toString()}
+      </p>
     </div>
   );
 }

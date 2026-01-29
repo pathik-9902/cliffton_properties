@@ -18,7 +18,7 @@ export interface Property {
   city: string;
   area?: string;
   price: number;
-
+  verified: boolean;
   views_count?: number;
   enquiries_count?: number;
   created_at: string;
