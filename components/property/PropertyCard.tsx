@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
@@ -13,15 +14,24 @@ import {
   ShieldCheck,
   Building2,
   ArrowRight,
+  MessageCircle,
 } from 'lucide-react';
 
 import { FullPropertyDetails } from '@/types/property';
 
+/* ---------------- TYPES ---------------- */
+
 type PropertyCardProps = {
   property: FullPropertyDetails;
+  priority?: boolean; // 🔥 for above-the-fold images
 };
 
-export default function PropertyCard({ property }: PropertyCardProps) {
+/* ---------------- COMPONENT ---------------- */
+
+function PropertyCardComponent({
+  property,
+  priority = false,
+}: PropertyCardProps) {
   const {
     id,
     title,
@@ -39,22 +49,43 @@ export default function PropertyCard({ property }: PropertyCardProps) {
     images,
   } = property;
 
-  /* ---------------- DERIVED VALUES ---------------- */
+  /* ---------------- MEMOIZED DERIVED VALUES ---------------- */
 
-  const coverImage =
-    images?.slice().sort((a, b) => a.sort_order - b.sort_order)[0]?.image_url ??
-    '/placeholder.png';
+  const coverImage = useMemo(() => {
+    return (
+      images?.slice().sort((a, b) => a.sort_order - b.sort_order)[0]
+        ?.image_url ?? '/placeholder.png'
+    );
+  }, [images]);
 
-  const builtUpArea =
-    residential_details?.built_up_area ??
-    commercial_details?.built_up_area ??
-    undefined;
+  const builtUpArea = useMemo(() => {
+    return (
+      residential_details?.built_up_area ??
+      commercial_details?.built_up_area ??
+      undefined
+    );
+  }, [residential_details, commercial_details]);
 
-  const formatPrice = (amount: number) => {
-    if (amount >= 1_00_00_000) return `${(amount / 1_00_00_000).toFixed(2)} Cr`;
-    if (amount >= 1_00_000) return `${(amount / 1_00_000).toFixed(2)} L`;
-    return amount.toLocaleString('en-IN');
-  };
+  const formattedPrice = useMemo(() => {
+    if (price >= 1_00_00_000)
+      return `${(price / 1_00_00_000).toFixed(2)} Cr`;
+    if (price >= 1_00_000)
+      return `${(price / 1_00_000).toFixed(2)} L`;
+    return price.toLocaleString('en-IN');
+  }, [price]);
+
+  const formattedDate = useMemo(() => {
+    if (!possession_date) return null;
+
+    return new Date(possession_date).toLocaleDateString('en-IN', {
+      month: 'short',
+      year: 'numeric',
+    });
+  }, [possession_date]);
+
+  const whatsappLink = useMemo(() => {
+    return `https://wa.me/919999999999?text=I am interested in property ${id} - ${title}`;
+  }, [id, title]);
 
   /* ---------------- UI ---------------- */
 
@@ -66,13 +97,12 @@ export default function PropertyCard({ property }: PropertyCardProps) {
           src={coverImage}
           alt={title}
           fill
-          loading="eager"
-          priority
           sizes="(max-width: 768px) 100vw, 33vw"
           className="object-cover transition-transform duration-700 group-hover:scale-110"
+          priority={priority} // 🔥 only true for first few cards
         />
 
-        {/* GRADIENT OVERLAY */}
+        {/* GRADIENT */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
 
         {/* LEFT BADGES */}
@@ -81,7 +111,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
           {is_featured && <Badge variant="featured">FEATURED</Badge>}
         </div>
 
-        {/* STATUS BADGE */}
+        {/* STATUS */}
         <div className="absolute top-4 right-4">
           <Badge variant={status.toLowerCase()}>
             {status.toUpperCase()}
@@ -89,20 +119,18 @@ export default function PropertyCard({ property }: PropertyCardProps) {
         </div>
 
         {/* POSSESSION */}
-        {possession_date && (
+        {formattedDate && (
           <div className="absolute bottom-4 left-4 flex items-center gap-1.5 rounded-lg bg-black/60 px-2 py-1 text-[10px] font-bold text-white backdrop-blur">
             <Calendar className="h-3 w-3" />
-            {new Date(possession_date).toLocaleDateString('en-IN', {
-              month: 'short',
-              year: 'numeric',
-            })}
+            {formattedDate}
           </div>
         )}
+
+       
       </div>
 
       {/* CONTENT */}
       <div className="flex flex-grow flex-col p-5">
-        {/* HEADER */}
         <div className="mb-4">
           <div className="mb-1 flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-[#8b6f4e]">
             <Building2 className="h-3 w-3" />
@@ -164,26 +192,42 @@ export default function PropertyCard({ property }: PropertyCardProps) {
         </div>
 
         {/* FOOTER */}
-        <div className="mt-auto flex items-center justify-between pt-4">
+        <div className="mt-auto flex items-center justify-between gap-2 pt-4">
           <div>
             <p className="mb-1 text-[10px] font-bold uppercase text-gray-400">
               Price
             </p>
             <p className="text-2xl font-extrabold text-[#1f1f1f]">
-              ₹{formatPrice(price)}
+              ₹{formattedPrice}
             </p>
           </div>
 
-          <Link href={`/properties/detail/${id}`}>
-            <button className="group/button flex items-center justify-center rounded-xl bg-[#ede3d5] p-3 text-[#6f4e37] shadow-sm transition-all duration-300 hover:bg-[#6f4e37] hover:text-white">
-              <ArrowRight className="h-5 w-5 transition-transform duration-300 group-hover/button:translate-x-1" />
-            </button>
-          </Link>
+          <div className="flex gap-2">
+            <Link href={`/properties/detail/${id}`}>
+              <button className="flex items-center justify-center rounded-xl bg-[#ede3d5] p-3 text-[#6f4e37] shadow-sm transition hover:bg-[#6f4e37] hover:text-white">
+                <ArrowRight className="h-5 w-5" />
+              </button>
+            </Link>
+
+            <a
+              href={whatsappLink}
+              target="_blank"
+              className="flex items-center justify-center rounded-xl bg-green-500 p-3 text-white shadow-sm hover:bg-green-600"
+            >
+              <MessageCircle className="h-5 w-5" />
+            </a>
+          </div>
         </div>
       </div>
     </div>
   );
 }
+
+/* ---------------- MEMO WRAPPER ---------------- */
+
+const PropertyCard = React.memo(PropertyCardComponent);
+
+export default PropertyCard;
 
 /* ---------------- SUB COMPONENTS ---------------- */
 

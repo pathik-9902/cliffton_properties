@@ -39,49 +39,51 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Contact Us', href: '/contact' },
 ];
 
-
 export default function Navbar() {
-  const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileSubmenu, setMobileSubmenu] = useState<string | null>(null);
 
   return (
-    <header className="border-b border-[#E5D9CC] bg-[#F4E9DD]">
+    <header className="border-b border-[#E5D9CC] bg-[#F4E9DD] sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-4 flex items-center justify-between">
+
+        {/* Logo */}
         <Link href="/" className="text-xl font-semibold">
           Cliffton Properties
         </Link>
 
-        {/* Desktop Navigation */}
+        {/* Desktop Nav */}
         <nav className="hidden md:flex gap-8 text-sm font-medium">
           {NAV_ITEMS.map((item) => (
-            <div
-              key={item.label}
-              className="relative"
-              onMouseEnter={() => setOpenMenu(item.label)}
-              onMouseLeave={() => setOpenMenu(null)}
-            >
+            <div key={item.label} className="relative group">
+
               {item.href ? (
-                <Link href={item.href} className="hover:text-[#6B6B6B]">
+                <Link
+                  href={item.href}
+                  className="hover:text-[#6B6B6B] transition"
+                >
                   {item.label}
                 </Link>
               ) : (
-                <button className="hover:text-[#6B6B6B]">
+                <button
+                  className="hover:text-[#6B6B6B] transition"
+                  aria-haspopup="menu"
+                >
                   {item.label}
                 </button>
               )}
 
-              {/* Desktop Dropdown — FIXED */}
-              {item.children && openMenu === item.label && (
+              {/* Dropdown */}
+              {item.children && (
                 <div
                   className="
+                    invisible opacity-0 translate-y-2
+                    group-hover:visible group-hover:opacity-100 group-hover:translate-y-0
+                    transition-all duration-200
                     absolute left-0 top-full
-                    w-44
-                    rounded-xl
+                    w-44 rounded-xl
                     border border-[#E5D9CC]
-                    bg-white
-                    shadow-lg
-                    z-50
+                    bg-white shadow-lg
                   "
                 >
                   {item.children.map((child) => (
@@ -102,8 +104,11 @@ export default function Navbar() {
         {/* Mobile Toggle */}
         <button
           className="md:hidden text-2xl"
-          onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label="Toggle menu"
+          onClick={() => {
+            setMobileOpen(!mobileOpen);
+            setMobileSubmenu(null);
+          }}
+          aria-label="Toggle Menu"
         >
           ☰
         </button>
@@ -111,19 +116,22 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-[#E5D9CC] bg-[#F4E9DD]">
+        <div className="md:hidden border-t border-[#E5D9CC] bg-[#F4E9DD] max-h-[80vh] overflow-y-auto">
           <nav className="px-6 py-4 space-y-2">
+
             {NAV_ITEMS.map((item) => (
               <div key={item.label}>
+
                 {item.children ? (
                   <>
                     <button
+                      className="w-full flex justify-between py-2 font-medium"
                       onClick={() =>
-                        setMobileSubmenu(
-                          mobileSubmenu === item.label ? null : item.label
+                        setMobileSubmenu(prev =>
+                          prev === item.label ? null : item.label
                         )
                       }
-                      className="w-full flex justify-between py-2 font-medium"
+                      aria-expanded={mobileSubmenu === item.label}
                     >
                       {item.label}
                       <span>
@@ -138,7 +146,10 @@ export default function Navbar() {
                             key={child.href}
                             href={child.href}
                             className="block py-2 text-sm text-[#6B6B6B]"
-                            onClick={() => setMobileOpen(false)}
+                            onClick={() => {
+                              setMobileOpen(false);
+                              setMobileSubmenu(null);
+                            }}
                           >
                             {child.label}
                           </Link>
@@ -150,13 +161,18 @@ export default function Navbar() {
                   <Link
                     href={item.href!}
                     className="block py-2 font-medium"
-                    onClick={() => setMobileOpen(false)}
+                    onClick={() => {
+                      setMobileOpen(false);
+                      setMobileSubmenu(null);
+                    }}
                   >
                     {item.label}
                   </Link>
                 )}
+
               </div>
             ))}
+
           </nav>
         </div>
       )}
