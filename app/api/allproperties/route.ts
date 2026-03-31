@@ -1,7 +1,7 @@
 // app/api/properties/route.ts
 
 import { NextResponse } from 'next/server';
-import data from '@/data.json';
+import data from '@/data/data.json';
 import { FullPropertyDetails, PropertyResponse } from '@/types/property';
 
 export async function GET(req: Request) {

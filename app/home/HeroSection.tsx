@@ -3,12 +3,8 @@
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 
-export default function HeroSection({
-  listingType,
-}: {
-  listingType: 'rent' | 'sale';
-}) {
-  const baseUrl = `/properties?category=residential&type=${listingType}`;
+export default function HeroSection(): React.ReactNode {
+  const baseUrl = `/properties`;
 
   return (
     <section className="relative overflow-hidden">

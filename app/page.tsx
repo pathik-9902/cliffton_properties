@@ -37,7 +37,7 @@ export default function HomePage() {
 
   return (
     <main className="bg-[#faf7f3]">
-      <HeroSection listingType={listingType} />
+      <HeroSection/>
 
       <SearchSection
         listingType={listingType}
