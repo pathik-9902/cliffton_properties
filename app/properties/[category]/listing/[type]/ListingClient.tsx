@@ -33,6 +33,9 @@ export default function ListingClient({
 
   const [response, setResponse] = useState<ApiResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  /* ✅ ALWAYS RUN HOOKS IN SAME ORDER */
 
   const filters = useMemo(() => {
     const obj: Record<string, string> = {};
@@ -44,6 +47,10 @@ export default function ListingClient({
 
     return obj;
   }, [searchString]);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -80,6 +87,14 @@ export default function ListingClient({
 
   const properties = response?.data || [];
   const meta = response?.meta;
+
+  /* ✅ SAFE RENDER */
+
+  if (!mounted) {
+    return (
+      <section className="bg-[#F4EFE9] min-h-screen" />
+    );
+  }
 
   return (
     <section className="bg-[#F4EFE9] min-h-screen text-[#1F1F1F]">
@@ -155,13 +170,6 @@ export default function ListingClient({
             )}
           </div>
         </div>
-      </div>
-
-      {/* MOBILE CTA */}
-      <div className="fixed bottom-0 left-0 right-0 lg:hidden bg-white/90 backdrop-blur-xl border-t border-[#E8E2DA] p-4">
-        <button className="w-full bg-black text-white py-3 rounded-2xl text-sm font-medium transition-all duration-300 hover:opacity-90">
-          Apply Filters
-        </button>
       </div>
     </section>
   );

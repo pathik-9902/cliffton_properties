@@ -14,7 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" data-scroll-behavior="smooth">
       <body className="bg-[#F4E9DD] text-[#0F0F0F] antialiased">
         <Navbar />
 
@@ -22,7 +22,7 @@ export default function RootLayout({
           {children}
         </main>
 
-        <Footer/>
+        <Footer />
       </body>
     </html>
   );
