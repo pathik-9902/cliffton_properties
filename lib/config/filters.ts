@@ -18,13 +18,13 @@ export type FilterConfig =
       type: 'price';
     };
 
-export type FilterCategory =
+type FilterCategory =
   | 'common'
   | 'residential'
   | 'commercial'
   | 'land';
 
-export type FiltersConfigType = Record<
+type FiltersConfigType = Record<
   FilterCategory,
   FilterConfig[]
 >;

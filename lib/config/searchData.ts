@@ -1,6 +1,6 @@
 // lib/config/searchData.ts
 
-export type SuggestionType = {
+type SuggestionType = {
   label: string;
   type: 'city' | 'area';
   city?: string;

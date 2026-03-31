@@ -1,9 +1,5 @@
 export type PropertyCategory = 'residential' | 'commercial' | 'land';
 export type ListingType = 'rent' | 'sale';
-export type FurnishingType =
-  | 'unfurnished'
-  | 'semi-furnished'
-  | 'fully-furnished';
 
 export interface Property {
   id: string;
