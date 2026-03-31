@@ -44,80 +44,92 @@ export default function Navbar() {
   const [mobileSubmenu, setMobileSubmenu] = useState<string | null>(null);
 
   return (
-    <header className="border-b border-[#E5D9CC] bg-[#F4E9DD] sticky top-0 z-50">
+    <header className="sticky top-0 z-50 backdrop-blur-xl bg-[#F4EFE9]/80 border-b border-[#E8E2DA]">
+
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-4 flex items-center justify-between">
 
-        {/* Logo */}
-        <Link href="/" className="text-xl font-semibold">
+        {/* LOGO */}
+        <Link href="/" className="text-lg font-semibold tracking-tight">
           Cliffton Properties
         </Link>
 
-        {/* Desktop Nav */}
-        <nav className="hidden md:flex gap-8 text-sm font-medium">
+        {/* DESKTOP NAV */}
+        <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
+
           {NAV_ITEMS.map((item) => (
             <div key={item.label} className="relative group">
 
               {item.href ? (
                 <Link
                   href={item.href}
-                  className="hover:text-[#6B6B6B] transition"
+                  className="text-[#1F1F1F] hover:text-[#6B6B6B] transition"
                 >
                   {item.label}
                 </Link>
               ) : (
-                <button
-                  className="hover:text-[#6B6B6B] transition"
-                  aria-haspopup="menu"
-                >
+                <button className="text-[#1F1F1F] hover:text-[#6B6B6B] transition">
                   {item.label}
                 </button>
               )}
 
-              {/* Dropdown */}
+              {/* DROPDOWN */}
               {item.children && (
                 <div
                   className="
-                    invisible opacity-0 translate-y-2
-                    group-hover:visible group-hover:opacity-100 group-hover:translate-y-0
-                    transition-all duration-200
-                    absolute left-0 top-full
-                    w-44 rounded-xl
-                    border border-[#E5D9CC]
-                    bg-white shadow-lg
+                    absolute left-0 top-full mt-3
+                    w-48 rounded-2xl
+                    bg-white border border-[#E8E2DA]
+                    shadow-lg
+                    opacity-0 invisible translate-y-2
+                    group-hover:opacity-100 group-hover:visible group-hover:translate-y-0
+                    transition-all duration-300
                   "
                 >
                   {item.children.map((child) => (
                     <Link
                       key={child.href}
                       href={child.href}
-                      className="block px-4 py-3 text-sm hover:bg-[#F4E9DD]"
+                      className="block px-5 py-3 text-sm text-[#6B6B6B] hover:bg-[#F4EFE9] hover:text-[#1F1F1F] transition"
                     >
                       {child.label}
                     </Link>
                   ))}
                 </div>
               )}
+
             </div>
           ))}
+
         </nav>
 
-        {/* Mobile Toggle */}
+        {/* CTA (Desktop) */}
+        <div className="hidden md:block">
+          <Link
+            href="/want-to-list"
+            className="bg-black text-white px-5 py-2 rounded-xl text-sm hover:opacity-90 transition"
+          >
+            List Property
+          </Link>
+        </div>
+
+        {/* MOBILE TOGGLE */}
         <button
-          className="md:hidden text-2xl"
+          className="md:hidden text-xl"
           onClick={() => {
             setMobileOpen(!mobileOpen);
             setMobileSubmenu(null);
           }}
-          aria-label="Toggle Menu"
         >
           ☰
         </button>
+
       </div>
 
-      {/* Mobile Menu */}
+      {/* MOBILE MENU */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-[#E5D9CC] bg-[#F4E9DD] max-h-[80vh] overflow-y-auto">
-          <nav className="px-6 py-4 space-y-2">
+        <div className="md:hidden border-t border-[#E8E2DA] bg-[#F4EFE9]">
+
+          <nav className="px-6 py-5 space-y-3">
 
             {NAV_ITEMS.map((item) => (
               <div key={item.label}>
@@ -125,13 +137,12 @@ export default function Navbar() {
                 {item.children ? (
                   <>
                     <button
-                      className="w-full flex justify-between py-2 font-medium"
+                      className="w-full flex justify-between py-2 font-medium text-[#1F1F1F]"
                       onClick={() =>
                         setMobileSubmenu(prev =>
                           prev === item.label ? null : item.label
                         )
                       }
-                      aria-expanded={mobileSubmenu === item.label}
                     >
                       {item.label}
                       <span>
@@ -140,12 +151,12 @@ export default function Navbar() {
                     </button>
 
                     {mobileSubmenu === item.label && (
-                      <div className="pl-4">
+                      <div className="pl-4 space-y-2">
                         {item.children.map((child) => (
                           <Link
                             key={child.href}
                             href={child.href}
-                            className="block py-2 text-sm text-[#6B6B6B]"
+                            className="block text-sm text-[#6B6B6B] hover:text-[#1F1F1F]"
                             onClick={() => {
                               setMobileOpen(false);
                               setMobileSubmenu(null);
@@ -160,7 +171,7 @@ export default function Navbar() {
                 ) : (
                   <Link
                     href={item.href!}
-                    className="block py-2 font-medium"
+                    className="block py-2 font-medium text-[#1F1F1F]"
                     onClick={() => {
                       setMobileOpen(false);
                       setMobileSubmenu(null);
@@ -173,9 +184,22 @@ export default function Navbar() {
               </div>
             ))}
 
+            {/* MOBILE CTA */}
+            <div className="pt-4">
+              <Link
+                href="/want-to-list"
+                className="block w-full text-center bg-black text-white py-3 rounded-xl text-sm"
+                onClick={() => setMobileOpen(false)}
+              >
+                List Property
+              </Link>
+            </div>
+
           </nav>
+
         </div>
       )}
+
     </header>
   );
 }

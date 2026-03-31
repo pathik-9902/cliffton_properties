@@ -29,16 +29,10 @@ export default function ListingClient({
   type: string;
 }) {
   const searchParams = useSearchParams();
-
-  /* 🔥 STABLE STRING */
   const searchString = searchParams.toString();
-
-  /* ---------------- STATE ---------------- */
 
   const [response, setResponse] = useState<ApiResponse | null>(null);
   const [loading, setLoading] = useState(true);
-
-  /* ---------------- NORMALIZE FILTERS ---------------- */
 
   const filters = useMemo(() => {
     const obj: Record<string, string> = {};
@@ -50,8 +44,6 @@ export default function ListingClient({
 
     return obj;
   }, [searchString]);
-
-  /* ---------------- FETCH FROM API ---------------- */
 
   useEffect(() => {
     const controller = new AbortController();
@@ -71,7 +63,6 @@ export default function ListingClient({
         });
 
         const data: ApiResponse = await res.json();
-
         setResponse(data);
       } catch (err) {
         if ((err as any).name !== 'AbortError') {
@@ -87,79 +78,112 @@ export default function ListingClient({
     return () => controller.abort();
   }, [category, type, filters]);
 
-  /* ---------------- DATA ---------------- */
-
   const properties = response?.data || [];
   const meta = response?.meta;
 
-  /* ---------------- UI ---------------- */
-
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+    <section className="bg-[#F4EFE9] min-h-screen text-[#1F1F1F]">
       {/* HEADER */}
-      <header className="mb-6 flex justify-between items-center">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-semibold capitalize">
-            {category} properties for {type}
-          </h1>
+      <div className="sticky top-0 z-40 backdrop-blur-xl bg-[#F4EFE9]/80 border-b border-[#E8E2DA]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-semibold capitalize tracking-tight">
+              {category} for {type}
+            </h1>
 
-          <p className="text-sm text-gray-500 mt-1">
-            {loading
-              ? 'Loading...'
-              : `Showing ${meta?.total ?? 0} result${
-                  meta?.total !== 1 ? 's' : ''
-                }`}
-          </p>
-        </div>
-      </header>
-
-      {/* MOBILE FILTER */}
-      <div className="lg:hidden mb-4">
-        <details className="bg-white border rounded-xl">
-          <summary className="cursor-pointer p-3 font-medium">
-            Filters
-          </summary>
-
-          <div className="p-4 border-t">
-            <Filters category={category} initialFilters={filters} />
+            <p className="text-sm text-[#6B6B6B] mt-1">
+              {loading
+                ? 'Loading premium listings...'
+                : `Showing ${meta?.total ?? 0} result${
+                    meta?.total !== 1 ? 's' : ''
+                  }`}
+            </p>
           </div>
-        </details>
+        </div>
       </div>
 
-      <div className="flex gap-8">
-        {/* DESKTOP FILTER */}
-        <aside className="w-72 hidden lg:block">
-          <Filters category={category} initialFilters={filters} />
-        </aside>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+        {/* MOBILE FILTER */}
+        <div className="lg:hidden mb-6">
+          <details className="bg-white rounded-2xl shadow-sm border border-[#E8E2DA] overflow-hidden">
+            <summary className="cursor-pointer px-5 py-4 font-medium text-sm">
+              Filters
+            </summary>
 
-        {/* LISTINGS */}
-        <div className="flex-1">
-          {loading ? (
-            <div className="py-20 text-center text-gray-400">
-              Loading properties...
+            <div className="p-5 border-t border-[#E8E2DA]">
+              <Filters category={category} initialFilters={filters} />
             </div>
-          ) : properties.length === 0 ? (
-            <div className="py-20 text-center text-gray-400">
-              No properties found.
-            </div>
-          ) : (
-            <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {properties.map((property, index) => (
-                  <PropertyCard
-                    key={property.id}
-                    property={property}
-                    priority={index < 3}
-                  />
-                ))}
-              </div>
-
-              {meta && <Pagination meta={meta} filters={filters} />}
-            </>
-          )}
+          </details>
         </div>
+
+        <div className="flex gap-10">
+          {/* DESKTOP FILTER */}
+          <aside className="w-80 hidden lg:block">
+            <div className="sticky top-28 bg-white rounded-3xl border border-[#E8E2DA] shadow-sm p-6">
+              <Filters category={category} initialFilters={filters} />
+            </div>
+          </aside>
+
+          {/* LISTINGS */}
+          <div className="flex-1">
+            {loading ? (
+              <SkeletonGrid />
+            ) : properties.length === 0 ? (
+              <div className="py-24 text-center">
+                <p className="text-[#6B6B6B] text-base">
+                  No properties found.
+                </p>
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {properties.map((property, index) => (
+                    <div
+                      key={property.id}
+                      className="transition-all duration-300 hover:scale-[1.02] hover:shadow-xl rounded-3xl"
+                    >
+                      <PropertyCard
+                        property={property}
+                        priority={index < 3}
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                {meta && <Pagination meta={meta} filters={filters} />}
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* MOBILE CTA */}
+      <div className="fixed bottom-0 left-0 right-0 lg:hidden bg-white/90 backdrop-blur-xl border-t border-[#E8E2DA] p-4">
+        <button className="w-full bg-black text-white py-3 rounded-2xl text-sm font-medium transition-all duration-300 hover:opacity-90">
+          Apply Filters
+        </button>
       </div>
     </section>
+  );
+}
+
+/* ---------------- SKELETON ---------------- */
+
+function SkeletonGrid() {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div
+          key={i}
+          className="animate-pulse bg-white rounded-3xl border border-[#E8E2DA] shadow-sm p-4 space-y-4"
+        >
+          <div className="h-52 bg-[#E8E2DA] rounded-xl" />
+          <div className="h-4 bg-[#E8E2DA] rounded w-3/4" />
+          <div className="h-4 bg-[#E8E2DA] rounded w-1/2" />
+          <div className="h-6 bg-[#D8CBBE] rounded w-1/3" />
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -175,7 +199,7 @@ function Pagination({
   if (meta.totalPages <= 1) return null;
 
   return (
-    <div className="flex justify-center gap-2 mt-10 flex-wrap">
+    <div className="flex justify-center gap-3 mt-16 flex-wrap">
       {Array.from({ length: meta.totalPages }).map((_, i) => {
         const page = i + 1;
 
@@ -191,10 +215,10 @@ function Pagination({
           <a
             key={page}
             href={`?${params.toString()}`}
-            className={`px-4 py-2 border rounded-lg text-sm ${
+            className={`px-5 py-2.5 rounded-2xl text-sm font-medium transition-all duration-300 ${
               page === meta.page
-                ? 'bg-black text-white'
-                : 'bg-white hover:bg-gray-100'
+                ? 'bg-black text-white shadow-md'
+                : 'bg-white border border-[#E8E2DA] text-[#6B6B6B] hover:bg-[#F4EFE9]'
             }`}
           >
             {page}

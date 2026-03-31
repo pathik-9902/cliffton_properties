@@ -10,8 +10,8 @@ import {
   useCallback,
 } from 'react';
 
-import { getFiltersConfig } from '@/lib/getFiltersConfig';
-import { FilterConfig } from '@/app/api/config/filters';
+import { getFiltersConfig } from '@/lib/config/getFiltersConfig';
+import { FilterConfig } from '@/lib/config/filters';
 
 /* ---------------- TYPES ---------------- */
 
@@ -32,8 +32,6 @@ export default function Filters({
 
   const searchString = searchParams.toString();
 
-  /* ---------------- STATE ---------------- */
-
   const [filters, setFilters] =
     useState<Record<string, string>>(initialFilters);
 
@@ -48,13 +46,11 @@ export default function Filters({
   const isFirstRender = useRef(true);
   const prevQueryRef = useRef('');
 
-  /* ---------------- CONFIG ---------------- */
-
   const config: FilterConfig[] = useMemo(() => {
     return getFiltersConfig(category);
   }, [category]);
 
-  /* ---------------- SYNC FROM URL ---------------- */
+  /* ---------------- SYNC ---------------- */
 
   useEffect(() => {
     const params = new URLSearchParams(searchString);
@@ -144,23 +140,25 @@ export default function Filters({
     });
   }, [router]);
 
-  /* ---------------- ACTIVE FILTER COUNT ---------------- */
-
-  const activeCount = Object.keys(filters).filter(
-    (k) => filters[k]
-  ).length + (minPrice || maxPrice ? 1 : 0);
+  const activeCount =
+    Object.keys(filters).filter((k) => filters[k]).length +
+    (minPrice || maxPrice ? 1 : 0);
 
   /* ---------------- UI ---------------- */
 
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl p-5 space-y-6 shadow-sm sticky top-20">
+    <div className="bg-white rounded-3xl border border-[#E8E2DA] shadow-sm p-6 space-y-8">
+
       {/* HEADER */}
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-start">
         <div>
-          <h2 className="font-semibold text-lg">Filters</h2>
+          <h2 className="font-semibold text-lg text-[#1F1F1F]">
+            Filters
+          </h2>
+
           {activeCount > 0 && (
-            <p className="text-xs text-gray-400 mt-1">
-              {activeCount} active
+            <p className="text-xs text-[#6B6B6B] mt-1">
+              {activeCount} active filters
             </p>
           )}
         </div>
@@ -168,30 +166,30 @@ export default function Filters({
         {activeCount > 0 && (
           <button
             onClick={clearFilters}
-            className="text-xs text-red-500 hover:underline"
+            className="text-xs text-[#C9A24D] hover:underline"
           >
             Clear all
           </button>
         )}
       </div>
 
-      {/* FILTERS */}
+      {/* FILTER GROUPS */}
       {config.map((filter) => {
-        /* ---------------- PRICE ---------------- */
+        /* PRICE */
         if (filter.type === 'price') {
           return (
-            <div key="price" className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">
+            <div key="price" className="space-y-3">
+              <label className="text-sm font-medium text-[#1F1F1F]">
                 {filter.label}
               </label>
 
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 <input
                   type="number"
                   placeholder="Min ₹"
                   value={minPrice}
                   onChange={(e) => setMinPrice(e.target.value)}
-                  className="w-full border p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black/10"
+                  className="w-full border border-[#E8E2DA] bg-[#F4EFE9] p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#C9A24D]/30 transition"
                 />
 
                 <input
@@ -199,17 +197,17 @@ export default function Filters({
                   placeholder="Max ₹"
                   value={maxPrice}
                   onChange={(e) => setMaxPrice(e.target.value)}
-                  className="w-full border p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black/10"
+                  className="w-full border border-[#E8E2DA] bg-[#F4EFE9] p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#C9A24D]/30 transition"
                 />
               </div>
             </div>
           );
         }
 
-        /* ---------------- SELECT ---------------- */
+        /* SELECT */
         return (
-          <div key={filter.key} className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
+          <div key={filter.key} className="space-y-3">
+            <label className="text-sm font-medium text-[#1F1F1F]">
               {filter.label}
             </label>
 
@@ -219,7 +217,7 @@ export default function Filters({
                 onChange={(e) =>
                   updateField(filter.key, e.target.value)
                 }
-                className="w-full border p-2.5 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-black/10 appearance-none"
+                className="w-full border border-[#E8E2DA] bg-[#F4EFE9] p-3 rounded-xl text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-[#C9A24D]/30 transition"
               >
                 <option value="">All</option>
 
@@ -230,8 +228,7 @@ export default function Filters({
                 ))}
               </select>
 
-              {/* Custom dropdown arrow */}
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B6B6B] text-xs">
                 ▼
               </span>
             </div>
@@ -241,7 +238,7 @@ export default function Filters({
 
       {/* LOADING */}
       {isPending && (
-        <div className="text-xs text-gray-400 animate-pulse">
+        <div className="text-xs text-[#6B6B6B] animate-pulse">
           Updating results...
         </div>
       )}

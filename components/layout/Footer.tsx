@@ -2,51 +2,124 @@ import Link from 'next/link';
 
 export default function Footer() {
   return (
-    <footer className="border-t border-border bg-background mt-20">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 py-12 grid md:grid-cols-4 gap-8 text-sm">
-        {/* Brand */}
-        <div>
-          <h3 className="font-semibold text-lg">Cliffton Properties</h3>
-          <p className="mt-3 text-muted">
+    <footer className="mt-20 bg-[#F4EFE9] border-t border-[#E8E2DA] text-[#1F1F1F]">
+
+      {/* TOP */}
+      <div className="max-w-7xl mx-auto px-6 md:px-12 py-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+
+        {/* BRAND */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold tracking-tight">
+            Cliffton Properties
+          </h3>
+
+          <p className="text-sm text-[#6B6B6B] leading-relaxed">
             Premium real estate advisory for residential, commercial,
             industrial, and land assets.
           </p>
         </div>
 
-        {/* Quick Links */}
+        {/* COMPANY */}
         <div>
-          <h4 className="font-medium mb-3">Company</h4>
-          <ul className="space-y-2 text-muted">
-            <li><Link href="/about-us">About Us</Link></li>
-            <li><Link href="/want-to-list">Want to List</Link></li>
-            <li><Link href="/contact-us">Contact</Link></li>
+          <h4 className="text-sm font-semibold mb-4">
+            Company
+          </h4>
+
+          <ul className="space-y-3 text-sm text-[#6B6B6B]">
+            <li>
+              <Link
+                href="/about-us"
+                className="hover:text-[#1F1F1F] transition"
+              >
+                About Us
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/want-to-list"
+                className="hover:text-[#1F1F1F] transition"
+              >
+                Want to List
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/contact-us"
+                className="hover:text-[#1F1F1F] transition"
+              >
+                Contact
+              </Link>
+            </li>
           </ul>
         </div>
 
-        {/* Property */}
+        {/* PROPERTIES */}
         <div>
-          <h4 className="font-medium mb-3">Properties</h4>
-          <ul className="space-y-2 text-muted">
-            <li><Link href="/residential/sale">Residential</Link></li>
-            <li><Link href="/commercial/sale">Commercial</Link></li>
-            <li><Link href="/industrial/sale">Industrial</Link></li>
-            <li><Link href="/land/sale">Land</Link></li>
+          <h4 className="text-sm font-semibold mb-4">
+            Properties
+          </h4>
+
+          <ul className="space-y-3 text-sm text-[#6B6B6B]">
+            <li>
+              <Link href="/residential/sale" className="hover:text-[#1F1F1F] transition">
+                Residential
+              </Link>
+            </li>
+            <li>
+              <Link href="/commercial/sale" className="hover:text-[#1F1F1F] transition">
+                Commercial
+              </Link>
+            </li>
+            <li>
+              <Link href="/industrial/sale" className="hover:text-[#1F1F1F] transition">
+                Industrial
+              </Link>
+            </li>
+            <li>
+              <Link href="/land/sale" className="hover:text-[#1F1F1F] transition">
+                Land
+              </Link>
+            </li>
           </ul>
         </div>
 
-        {/* Contact */}
+        {/* CONTACT */}
         <div>
-          <h4 className="font-medium mb-3">Contact</h4>
-          <p className="text-muted">
-            Email: info.clifftonproperties@gmail.com <br />
-            Phone: +91 XXXXX XXXXX
+          <h4 className="text-sm font-semibold mb-4">
+            Contact
+          </h4>
+
+          <div className="text-sm text-[#6B6B6B] space-y-3">
+            <p>
+              info.clifftonproperties@gmail.com
+            </p>
+            <p>
+              +91 XXXXX XXXXX
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* BOTTOM */}
+      <div className="border-t border-[#E8E2DA]">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#6B6B6B]">
+
+          <p>
+            © {new Date().getFullYear()} Cliffton Properties. All rights reserved.
           </p>
+
+          <div className="flex items-center gap-6">
+            <Link href="#" className="hover:text-[#1F1F1F] transition">
+              Privacy
+            </Link>
+            <Link href="#" className="hover:text-[#1F1F1F] transition">
+              Terms
+            </Link>
+          </div>
+
         </div>
       </div>
 
-      <div className="border-t border-border text-center py-4 text-xs text-muted">
-        © {new Date().getFullYear()} Cliffton Properties. All rights reserved.
-      </div>
     </footer>
   );
 }

@@ -10,9 +10,20 @@ export default async function ListingPage({
   const { category, type } = await params;
 
   return (
-    <ListingClient
-      category={category}
-      type={type}
-    />
+    <main className="bg-[#F4EFE9] min-h-screen">
+      {/* LUXURY CONTAINER WRAPPER */}
+      <div className="relative">
+        {/* SUBTLE TOP GRADIENT (PREMIUM TOUCH) */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#D8CBBE]/40 to-transparent pointer-events-none" />
+
+        {/* CONTENT */}
+        <div className="relative z-10">
+          <ListingClient
+            category={category}
+            type={type}
+          />
+        </div>
+      </div>
+    </main>
   );
 }

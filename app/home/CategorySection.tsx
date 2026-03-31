@@ -8,8 +8,30 @@ type Props = {
 };
 
 export default function CategorySection({ listingType }: Props) {
+  const categories = [
+    {
+      title: 'Residential',
+      icon: <Home />,
+      description: 'Apartments, villas, and homes.',
+      category: 'residential',
+    },
+    {
+      title: 'Commercial',
+      icon: <Building2 />,
+      description: 'Offices, shops, and business spaces.',
+      category: 'commercial',
+    },
+    {
+      title: 'Land',
+      icon: <LandPlot />,
+      description: 'Plots and development-ready land.',
+      category: 'land',
+    },
+  ];
+
   return (
     <section className="mx-auto max-w-7xl px-6 py-24">
+      
       <h2 className="text-center text-3xl font-bold text-[#1f1f1f]">
         Explore by Category
       </h2>
@@ -19,26 +41,22 @@ export default function CategorySection({ listingType }: Props) {
       </p>
 
       <div className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-       <Card
-  icon={<Home />}
-  title="Residential"
-  description="Apartments, villas, and homes."
-  href={`/properties/residential/listing/${listingType}?category=residential&listingType=${listingType}`}
-/>
+        {categories.map((cat) => {
+          const query = new URLSearchParams({
+            category: cat.category,
+            listing: listingType, // ✅ FIXED
+          }).toString();
 
-<Card
-  icon={<Building2 />}
-  title="Commercial"
-  description="Offices, shops, and business spaces."
-  href={`/properties/commercial/listing/${listingType}?category=commercial&listingType=${listingType}`}
-/>
-
-<Card
-  icon={<LandPlot />}
-  title="Land"
-  description="Plots and development-ready land."
-  href={`/properties/land/listing/${listingType}?category=land&listingType=${listingType}`}
-/>
+          return (
+            <Card
+              key={cat.title}
+              icon={cat.icon}
+              title={cat.title}
+              description={cat.description}
+              href={`/properties?${query}`}
+            />
+          );
+        })}
       </div>
     </section>
   );

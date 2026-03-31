@@ -8,6 +8,8 @@ export default function HeroSection({
 }: {
   listingType: 'rent' | 'sale';
 }) {
+  const baseUrl = `/properties?category=residential&type=${listingType}`;
+
   return (
     <section className="relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-[#6f4e37]/90 via-[#8b6f4e]/70 to-[#c6a15b]/40" />
@@ -25,7 +27,7 @@ export default function HeroSection({
 
         <div className="mt-10 flex flex-wrap gap-4">
           <Link
-            href={`/properties/residential/listing/${listingType}`}
+            href={baseUrl}
             className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 font-bold text-[#6f4e37] hover:bg-[#ede3d5]"
           >
             Browse Properties
