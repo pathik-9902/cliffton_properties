@@ -35,7 +35,6 @@ const NAV_ITEMS: NavItem[] = [
       { label: 'Sale', href: '/properties/land/listing/sale' },
     ],
   },
-  { label: 'Want to List', href: '/want-to-list' },
   { label: 'Contact Us', href: '/contact' },
 ];
 
