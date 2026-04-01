@@ -39,7 +39,7 @@ export default function FeaturedSection({
           </div>
 
           <Link
-            href="/allproperties?featured=true"
+            href="/properties?featured=true"
             className="text-sm font-bold text-[#6f4e37]"
           >
             View All →

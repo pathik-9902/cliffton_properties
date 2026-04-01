@@ -2,9 +2,30 @@
 
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import PropertySearchModal from '@/components/property/ProopertySearchModal';
 
 export default function HeroSection(): React.ReactNode {
-  const baseUrl = `/properties`;
+  const [open, setOpen] = useState(false);
+  const router = useRouter();
+
+  const handleSearch = (data: {
+    type: string;
+    category: string;
+    city: string;
+    area?: string;
+  }) => {
+    const { type, category, city, area } = data;
+
+    let url = `/properties/${type}/listing/${category}?city=${city}`;
+
+    if (area) {
+      url += `&area=${area}`;
+    }
+
+    router.push(url);
+  };
 
   return (
     <section className="relative overflow-hidden">
@@ -22,13 +43,13 @@ export default function HeroSection(): React.ReactNode {
         </p>
 
         <div className="mt-10 flex flex-wrap gap-4">
-          <Link
-            href={baseUrl}
+          <button
+            onClick={() => setOpen(true)}
             className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 font-bold text-[#6f4e37] hover:bg-[#ede3d5]"
           >
             Browse Properties
             <ArrowRight className="h-5 w-5" />
-          </Link>
+          </button>
 
           <Link
             href="/want-to-list"
@@ -38,6 +59,12 @@ export default function HeroSection(): React.ReactNode {
           </Link>
         </div>
       </div>
+
+      <PropertySearchModal
+        open={open}
+        onClose={() => setOpen(false)}
+        onSearch={handleSearch}
+      />
     </section>
   );
 }

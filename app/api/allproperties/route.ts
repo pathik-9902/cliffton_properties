@@ -1,4 +1,4 @@
-// app/api/properties/route.ts
+// app/api/allproperties/route.ts
 
 import { NextResponse } from 'next/server';
 import data from '@/data/data.json';

@@ -46,8 +46,8 @@ export default function HomePage() {
 
       <FeaturedSection properties={properties} />
 
-      <BrowseByLocalitySection properties={properties}/>
-      <PropertyTypeSection />
+      {/* <BrowseByLocalitySection properties={properties}/>
+      <PropertyTypeSection /> */}
 
       <CategorySection listingType={listingType} />
 

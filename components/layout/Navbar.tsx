@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState } from 'react';
 
 type NavItem = {
@@ -49,8 +50,15 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-4 flex items-center justify-between">
 
         {/* LOGO */}
-        <Link href="/" className="text-lg font-semibold tracking-tight">
-          Cliffton Properties
+        <Link href="/" className="flex items-center">
+          <Image
+            src="/logo_final.png"
+            alt="Cliffton Properties"
+            width={140}
+            height={40}
+            style={{ width: 'auto', height: '50px' }}
+            priority
+          />
         </Link>
 
         {/* DESKTOP NAV */}
