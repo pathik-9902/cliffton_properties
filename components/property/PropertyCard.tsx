@@ -12,7 +12,6 @@ import {
   ChevronLeft,
   ChevronRight,
   ShieldCheck,
-  MessageCircle,
 } from 'lucide-react';
 
 import { FullPropertyDetails } from '@/types/property';
@@ -86,24 +85,21 @@ function PropertyCardComponent({
   /* ---------------- UI ---------------- */
 
   return (
-    <div className="group relative overflow-hidden rounded-3xl bg-white/70 backdrop-blur-xl border border-white/20 shadow-lg hover:shadow-2xl transition-all duration-500">
+    <div className="group relative h-[440px] overflow-hidden rounded-3xl bg-[#F7F4EF]/80 backdrop-blur-xl border border-[#E5DFD8] shadow-[0_10px_30px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] transition-all duration-500">
 
       {/* IMAGE */}
       <div className="relative h-60 w-full">
-
         <Image
           src={currentImage}
           alt={title}
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           className="object-cover transition duration-700 group-hover:scale-110"
-
-          // ✅ Critical LCP Fix
           priority={priority}
           loading={priority ? 'eager' : 'lazy'}
         />
 
-        {/* LUXURY OVERLAY */}
+        {/* OVERLAY */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
 
         {/* SLIDER CONTROLS */}
@@ -111,14 +107,14 @@ function PropertyCardComponent({
           <>
             <button
               onClick={prevImage}
-              className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/30 backdrop-blur-md p-2 rounded-full text-white hover:bg-white/50"
+              className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/40 backdrop-blur-md p-2 rounded-full text-[#2B2B2B] hover:bg-white transition"
             >
               <ChevronLeft size={16} />
             </button>
 
             <button
               onClick={nextImage}
-              className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/30 backdrop-blur-md p-2 rounded-full text-white hover:bg-white/50"
+              className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/40 backdrop-blur-md p-2 rounded-full text-[#2B2B2B] hover:bg-white transition"
             >
               <ChevronRight size={16} />
             </button>
@@ -127,33 +123,33 @@ function PropertyCardComponent({
 
         {/* BADGES */}
         <div className="absolute top-4 left-4 flex gap-2">
-          <span className="bg-black/60 backdrop-blur-md text-white text-[10px] px-3 py-1 rounded-full tracking-widest">
+          <span className="bg-[#2B2B2B]/80 backdrop-blur-md text-white text-[10px] px-3 py-1 rounded-full tracking-widest">
             {listing_type.toUpperCase()}
           </span>
 
           {is_featured && (
-            <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white text-[10px] px-3 py-1 rounded-full">
+            <span className="bg-[#6B4A3A] text-white text-[10px] px-3 py-1 rounded-full">
               PREMIUM
             </span>
           )}
         </div>
 
         {/* WISHLIST */}
-        <button className="absolute top-4 right-4 bg-white/30 backdrop-blur-md p-2 rounded-full text-white hover:bg-white/50 transition">
+        <button className="absolute top-4 right-4 bg-white/40 backdrop-blur-md p-2 rounded-full text-[#6B4A3A] hover:bg-white transition">
           <Heart size={16} />
         </button>
 
         {/* VERIFIED */}
         {verified && (
-          <div className="absolute bottom-4 left-4 flex items-center gap-1 text-white text-xs bg-white/20 backdrop-blur-md px-3 py-1 rounded-full">
+          <div className="absolute bottom-4 left-4 flex items-center gap-1 text-white text-xs bg-[#6B4A3A]/90 backdrop-blur-md px-3 py-1 rounded-full">
             <ShieldCheck size={12} />
             Verified
           </div>
         )}
 
-        {/* PRICE OVERLAY */}
+        {/* PRICE */}
         <div className="absolute bottom-4 right-4 text-right">
-          <p className="text-white text-xl font-bold">
+          <p className="text-white text-xl font-semibold tracking-tight">
             ₹{formattedPrice}
           </p>
           <p className="text-xs text-white/70">
@@ -163,38 +159,47 @@ function PropertyCardComponent({
       </div>
 
       {/* CONTENT */}
-      <div className="p-5 space-y-3">
+      <div className="p-5 flex flex-col h-[200px]">
 
         {/* TITLE */}
-        <h3 className="text-base font-semibold text-gray-900 leading-snug line-clamp-2">
+        <h3 className="text-base font-semibold text-[#2B2B2B] leading-snug line-clamp-2 min-h-[44px]">
           {title}
         </h3>
 
         {/* LOCATION */}
-        <p className="text-sm text-gray-500 flex items-center">
+        <p className="text-sm text-[#6B7280] flex items-center mt-1">
           <MapPin size={14} className="mr-1 opacity-70" />
           {area ? `${area}, ` : ''}
           {city}
         </p>
 
         {/* SPECS */}
-        <div className="flex flex-wrap gap-2 pt-2">
+        <div className="flex flex-wrap gap-2 pt-2 min-h-[44px]">
           {category === 'residential' && residential_details && (
             <>
-              <Chip icon={<Bed size={12} />} value={`${residential_details.bedrooms} BHK`} />
-              <Chip icon={<Bath size={12} />} value={`${residential_details.bathrooms}`} />
+              <Chip
+                icon={<Bed size={12} />}
+                value={`${residential_details.bedrooms} BHK`}
+              />
+              <Chip
+                icon={<Bath size={12} />}
+                value={`${residential_details.bathrooms}`}
+              />
             </>
           )}
 
           {builtUpArea && (
-            <Chip icon={<Maximize size={12} />} value={`${builtUpArea} sqft`} />
+            <Chip
+              icon={<Maximize size={12} />}
+              value={`${builtUpArea} sqft`}
+            />
           )}
         </div>
 
         {/* CTA */}
-        <div className="pt-4 flex justify-between items-center">
+        <div className="mt-auto pt-4 flex justify-between items-center">
           <Link href={`/properties/detail/${id}`}>
-            <button className="text-sm font-medium text-gray-900 hover:underline">
+            <button className="text-sm font-medium text-[#2B2B2B] hover:text-[#6B4A3A] transition">
               View Details
             </button>
           </Link>
@@ -202,7 +207,7 @@ function PropertyCardComponent({
           <a
             href={whatsappLink}
             target="_blank"
-            className="bg-black text-white px-4 py-2 rounded-full text-xs hover:bg-gray-800 transition"
+            className="bg-[#6B4A3A] text-white px-4 py-2 rounded-full text-xs hover:bg-[#5a3e30] transition shadow-sm"
           >
             Contact
           </a>
@@ -227,7 +232,7 @@ function Chip({
   value: string;
 }) {
   return (
-    <div className="flex items-center gap-1 bg-gray-100/70 backdrop-blur px-3 py-1 rounded-full text-xs text-gray-700">
+    <div className="flex items-center gap-1 bg-[#EFE7DD] px-3 py-1 rounded-full text-xs text-[#6B4A3A]">
       {icon}
       <span>{value}</span>
     </div>
