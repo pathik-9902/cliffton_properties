@@ -51,19 +51,20 @@ export default function FeaturedListingCarousel({ properties }: Props) {
 
   // ---------------- SAFE IMAGE ----------------
   const getImageSrc = (images: any[]) => {
-    if (!images?.length) return '/placeholder.png';
+  if (!images?.length) return '/placeholder.png';
 
-    const first = images[0];
+  const first = images[0];
 
-    if (typeof first === 'string') return first;
+  if (typeof first === 'string') return first;
 
-    if (typeof first === 'object') {
-      if (first.url) return first.url;
-      if (first.src) return first.src;
-    }
+  if (typeof first === 'object') {
+    if (first.image_url) return first.image_url; // ✅ FIX
+    if (first.url) return first.url;
+    if (first.src) return first.src;
+  }
 
-    return '/placeholder.png';
-  };
+  return '/placeholder.png';
+};
 
   // ---------------- PRELOAD ----------------
   useEffect(() => {

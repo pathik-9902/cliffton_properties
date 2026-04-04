@@ -8,24 +8,49 @@ import PropertySearchModal from '@/components/property/ProopertySearchModal';
 
 const CAROUSEL_SLIDES = [
   {
-    image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2075&auto=format&fit=crop',
+    image: '/home/bg_img1.jpeg',
     title: 'Discover Properties That\nMatch Your Ambition',
     description: 'Buy or rent verified residential, commercial, and land properties with confidence.',
   },
   {
-    image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=2070&auto=format&fit=crop',
+    image: '/home/bg_img2.jpeg',
     title: 'Experience Unmatched\nLuxury Living',
     description: 'Find your dream home in the most exclusive and desirable neighborhoods.',
   },
   {
-    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop',
+    image: '/home/bg_img3.jpeg',
     title: 'Invest in the Future\nWith Prime Real Estate',
     description: 'Explore commercial and residential properties with high return on investment potential.',
   },
   {
-    image: 'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?q=80&w=2070&auto=format&fit=crop',
+    image: '/home/bg_img4.jpeg',
     title: 'Your Perfect Space\nAwaits You',
     description: 'Let us help you find the ideal architectural masterpiece that suits your lifestyle.',
+  },
+  {
+    image: '/home/bg_img5.jpeg',
+    title: 'Modern Living Spaces',
+    description: 'Explore thoughtfully designed homes built for comfort and elegance.',
+  },
+  {
+    image: '/home/bg_img6.jpeg',
+    title: 'Smart Investment Choices',
+    description: 'Secure your future with properties that deliver consistent value.',
+  },
+  {
+    image: '/home/bg_img7.jpeg',
+    title: 'Premium Locations',
+    description: 'Live in prime areas with access to top amenities and infrastructure.',
+  },
+  {
+    image: '/home/bg_img8.jpeg',
+    title: 'Tailored For Your Lifestyle',
+    description: 'Find spaces that perfectly align with your personal and professional needs.',
+  },
+  {
+    image: '/home/bg_img9.jpeg',
+    title: 'Built For Generations',
+    description: 'Invest in properties designed with long-term quality and durability.',
   },
 ];
 

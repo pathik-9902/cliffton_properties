@@ -9,3 +9,6 @@ npm run dev
 app/home/LocalitySection.tsx
 app/home/PropertyTypeSection.tsx
 app/home/FeaturedSection.tsx
+app/properties/PropertiesClient.tsx
+app/properties/page.tsx
+app/api/allproperties/route.ts
