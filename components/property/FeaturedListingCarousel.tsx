@@ -158,17 +158,10 @@ export default function FeaturedListingCarousel({ properties }: Props) {
 
           {/* CONTENT */}
           <div className="absolute bottom-0 w-full p-3 sm:p-4 text-white pointer-events-none">
-            <p className="text-[10px] sm:text-[11px] uppercase text-white/70 mb-1">
-              Featured Property
-            </p>
 
             <p className="text-[11px] sm:text-xs opacity-80 mb-1">
               {property.area}, {property.city}
             </p>
-
-            <h3 className="text-sm sm:text-base md:text-lg font-semibold line-clamp-2">
-              {property.title}
-            </h3>
 
             <p className="text-xs sm:text-sm mt-1 font-semibold text-white/90">
               ₹ {property.price?.toLocaleString()}
