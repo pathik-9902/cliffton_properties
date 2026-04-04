@@ -41,7 +41,6 @@ export default function PropertiesClient() {
         });
 
         const data = await res.json();
-
         setProperties(data.properties || []);
       } catch (err) {
         if ((err as any).name !== 'AbortError') {
@@ -55,18 +54,23 @@ export default function PropertiesClient() {
     fetchProperties();
   }, [queryString]);
 
-  // ---------------- FILTER HANDLERS ----------------
+  // ---------------- FILTER HANDLER ----------------
   const updateFilter = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
 
-    if (!value) params.delete(key);
-    else params.set(key, value);
+    if (!value || value === 'all') {
+      params.delete(key);
+    } else {
+      params.set(key, value);
+    }
 
-    router.replace(`/properties?${params.toString()}`);
-  };
+    // auto-clean empty params
+    for (const [k, v] of params.entries()) {
+      if (!v) params.delete(k);
+    }
 
-  const clearAllFilters = () => {
-    router.replace('/properties');
+    const newQuery = params.toString();
+    router.replace(newQuery ? `/properties?${newQuery}` : '/properties');
   };
 
   // ---------------- LABEL MAP ----------------
@@ -77,15 +81,22 @@ export default function PropertiesClient() {
     city: 'City',
     area: 'Area',
     bedrooms: 'BHK',
-    subtype: 'Type',
+    subtype: 'Subtype',
+    sort: 'Sort',
   };
+
+  const activeFilters = Array.from(searchParams.entries()).filter(
+    ([_, value]) => value
+  );
 
   // ---------------- UI ----------------
   return (
     <div className="max-w-7xl mx-auto px-6 py-10">
-      
+
       {/* FILTER CONTROLS */}
-      <div className="flex flex-wrap gap-4 mb-4">
+      <div className="flex flex-wrap gap-4 mb-6">
+
+        {/* LISTING */}
         <select
           onChange={(e) => updateFilter('listing', e.target.value)}
           value={searchParams.get('listing') || ''}
@@ -96,6 +107,7 @@ export default function PropertiesClient() {
           <option value="sale">Sale</option>
         </select>
 
+        {/* CATEGORY */}
         <select
           onChange={(e) => updateFilter('category', e.target.value)}
           value={searchParams.get('category') || ''}
@@ -107,6 +119,7 @@ export default function PropertiesClient() {
           <option value="land">Land</option>
         </select>
 
+        {/* FEATURED */}
         <select
           onChange={(e) => updateFilter('featured', e.target.value)}
           value={searchParams.get('featured') || ''}
@@ -115,40 +128,40 @@ export default function PropertiesClient() {
           <option value="">All</option>
           <option value="true">Featured</option>
         </select>
+
+        {/* SORT (NEW) */}
+        <select
+          onChange={(e) => updateFilter('sort', e.target.value)}
+          value={searchParams.get('sort') || ''}
+          className="border px-3 py-2 rounded"
+        >
+          <option value="">Default</option>
+          <option value="latest">Latest</option>
+          <option value="price_low">Price: Low → High</option>
+          <option value="price_high">Price: High → Low</option>
+        </select>
       </div>
 
-      {/* ACTIVE FILTERS */}
-      {searchParams.toString() && (
+      {/* ACTIVE FILTERS (AUTO HIDE IF EMPTY) */}
+      {activeFilters.length > 0 && (
         <div className="flex flex-wrap items-center gap-2 mb-6">
-          {Array.from(searchParams.entries()).map(([key, value]) => {
-            if (!value) return null;
+          {activeFilters.map(([key, value]) => (
+            <div
+              key={`${key}-${value}`}
+              className="flex items-center gap-2 bg-[#ede3d5] text-[#6f4e37] px-3 py-1 rounded-full text-sm font-medium"
+            >
+              <span>
+                {labelMap[key] || key}: {value}
+              </span>
 
-            return (
-              <div
-                key={`${key}-${value}`}
-                className="flex items-center gap-2 bg-[#ede3d5] text-[#6f4e37] px-3 py-1 rounded-full text-sm font-medium"
+              <button
+                onClick={() => updateFilter(key, '')}
+                className="text-xs font-bold hover:text-black"
               >
-                <span>
-                  {labelMap[key] || key}: {value}
-                </span>
-
-                <button
-                  onClick={() => updateFilter(key, '')}
-                  className="text-xs font-bold hover:text-black"
-                >
-                  ✕
-                </button>
-              </div>
-            );
-          })}
-
-          {/* CLEAR ALL */}
-          <button
-            onClick={clearAllFilters}
-            className="ml-2 text-sm text-red-500 font-semibold"
-          >
-            Clear All
-          </button>
+                ✕
+              </button>
+            </div>
+          ))}
         </div>
       )}
 

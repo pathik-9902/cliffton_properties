@@ -1,26 +1,59 @@
 'use client';
 
-import Link from 'next/link';
 import { Search } from 'lucide-react';
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { parseSearch } from '@/lib/config/parseSearch';
 import { SEARCH_SUGGESTIONS } from '@/lib/config/searchData';
+import FeaturedListingCarousel from '@/components/property/FeaturedListingCarousel';
 
-type Props = {
-  listingType: 'rent' | 'sale';
-  setListingType: (v: 'rent' | 'sale') => void;
+// ---------------- TYPES ----------------
+type Property = {
+  id: string;
+  title: string;
+  city: string;
+  area?: string;
+  price: number;
+  images: any[];
 };
 
-export default function SearchSection({
-  listingType,
-  setListingType,
-}: Props) {
+export default function SearchSection() {
   const [search, setSearch] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const [showModal, setShowModal] = useState(false);
 
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  // ---------------- CLOSE DROPDOWN ON OUTSIDE CLICK ----------------
+  // ---------------- FETCH FEATURED ----------------
+  useEffect(() => {
+    const fetchFeatured = async () => {
+      try {
+        const res = await fetch('/api/allproperties?featured=true');
+        const data = await res.json();
+
+        const filtered = (data.properties || []).filter(
+          (p: Property) =>
+            p &&
+            p.id &&
+            p.title &&
+            Array.isArray(p.images) &&
+            p.images.length > 0
+        );
+
+        setProperties(filtered);
+      } catch (err) {
+        console.error('Failed to fetch featured properties', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeatured();
+  }, []);
+
+  // ---------------- CLOSE DROPDOWN ----------------
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (!wrapperRef.current?.contains(e.target as Node)) {
@@ -29,10 +62,11 @@ export default function SearchSection({
     };
 
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    return () =>
+      document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // ---------------- FILTER SUGGESTIONS ----------------
+  // ---------------- FILTER ----------------
   const filteredSuggestions = useMemo(() => {
     if (!search.trim()) return [];
 
@@ -42,90 +76,141 @@ export default function SearchSection({
   }, [search]);
 
   // ---------------- BUILD QUERY ----------------
-  const buildQuery = () => {
+  const buildQuery = (type: 'rent' | 'sale') => {
     const parsed = parseSearch(search);
-    const query = new URLSearchParams();
+    const params = new URLSearchParams();
 
-    if (listingType) query.set('listing', listingType);
-    if (parsed.city) query.set('city', parsed.city);
-    if (parsed.area) query.set('area', parsed.area);
-    if (parsed.bedrooms) query.set('bedrooms', parsed.bedrooms);
-    if (search) query.set('search', search);
+    params.set('listing', type);
 
-    return query.toString();
+    if (parsed.city) params.set('city', parsed.city);
+    if (parsed.area) params.set('area', parsed.area);
+    if (parsed.bedrooms) params.set('bedrooms', parsed.bedrooms);
+
+    if (search.trim()) params.set('search', search.trim());
+
+    return `/properties?${params.toString()}`;
+  };
+
+  // ---------------- ENTER KEY ----------------
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      setShowModal(true);
+    }
   };
 
   return (
-    <section className="-mt-16 relative z-10">
-      <div className="mx-auto max-w-5xl px-6">
-        <div className="rounded-2xl bg-white p-6 shadow-xl border border-[#eee5db] space-y-4">
-          
-          {/* RENT / SALE */}
-          <div className="flex gap-2">
-            {(['rent', 'sale'] as const).map((type) => (
-              <button
-                key={type}
-                onClick={() => setListingType(type)}
-                className={`rounded-lg px-6 py-2 text-sm font-bold transition-all ${
-                  listingType === type
-                    ? 'bg-[#6f4e37] text-white'
-                    : 'bg-[#ede3d5] text-[#6f4e37]'
-                }`}
-              >
-                {type === 'rent' ? 'Rent' : 'Buy'}
-              </button>
-            ))}
-          </div>
+    <>
+      <section className="-mt-16 relative z-10">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6">
+          <div className="rounded-2xl bg-white p-4 sm:p-6 shadow-xl border border-[#eee5db] space-y-4 sm:space-y-5">
 
-          {/* SEARCH INPUT */}
-          <div
-            ref={wrapperRef}
-            className="relative flex flex-col gap-4 sm:flex-row"
-          >
-            <div className="relative flex flex-grow items-center gap-2 rounded-xl border border-[#e6ddcf] px-4 py-3">
-              <Search className="h-4 w-4 text-gray-400" />
+            {/* ---------------- CAROUSEL ---------------- */}
+            {loading ? (
+              <div className="h-44 sm:h-52 md:h-64 lg:h-72 rounded-xl bg-gray-100 animate-pulse" />
+            ) : (
+              <FeaturedListingCarousel properties={properties} />
+            )}
 
-              <input
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  setShowDropdown(true);
-                }}
-                onFocus={() => setShowDropdown(true)}
-                placeholder="Search city, area, or '2 BHK in Vesu'"
-                className="w-full text-sm outline-none"
-              />
-
-              {/* DROPDOWN */}
-              {showDropdown && filteredSuggestions.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white border rounded-xl shadow-lg z-50 max-h-60 overflow-y-auto">
-                  {filteredSuggestions.map((item) => (
-                    <div
-                      key={item.label}
-                      onClick={() => {
-                        setSearch(item.label);
-                        setShowDropdown(false);
-                      }}
-                      className="px-4 py-2 text-sm hover:bg-[#f5efe7] cursor-pointer"
-                    >
-                      {item.label}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* SEARCH BUTTON */}
-            <Link
-              href={`/properties?${buildQuery()}`}
-              className="flex items-center justify-center gap-2 rounded-xl bg-[#6f4e37] px-6 py-3 font-bold text-white hover:bg-[#5a3f2d]"
+            {/* ---------------- SEARCH ---------------- */}
+            <div
+              ref={wrapperRef}
+              className="relative flex flex-col sm:flex-row gap-3 sm:gap-4"
             >
-              <Search className="h-4 w-4" />
-              Search
-            </Link>
+              {/* INPUT */}
+              <div className="relative flex flex-grow items-center gap-2 rounded-xl border border-[#e6ddcf] px-4 py-3">
+                <Search className="h-4 w-4 text-gray-400" />
+
+                <input
+                  value={search}
+                  onChange={(e) => {
+                    setSearch(e.target.value);
+                    setShowDropdown(true);
+                  }}
+                  onFocus={() => setShowDropdown(true)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Search city, area, or '2 BHK in Vesu'"
+                  className="w-full text-sm outline-none"
+                />
+
+                {/* DROPDOWN */}
+                {showDropdown && filteredSuggestions.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-white border rounded-xl shadow-lg z-50 max-h-60 overflow-y-auto">
+                    {filteredSuggestions.map((item) => (
+                      <div
+                        key={item.label}
+                        onClick={() => {
+                          setSearch(item.label);
+                          setShowDropdown(false);
+                        }}
+                        className="px-4 py-2 text-sm hover:bg-[#f5efe7] cursor-pointer"
+                      >
+                        {item.label}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* BUTTON */}
+              <button
+                onClick={() => setShowModal(true)}
+                className="flex items-center justify-center gap-2 rounded-xl bg-[#6f4e37] px-5 sm:px-6 py-3 text-sm font-bold text-white hover:bg-[#5a3f2d] transition"
+              >
+                <Search className="h-4 w-4" />
+                Search
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      {/* ---------------- MODAL ---------------- */}
+      {showModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center">
+          
+          {/* BACKDROP */}
+          <div
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setShowModal(false)}
+          />
+
+          {/* MODAL BOX */}
+          <div className="relative bg-white rounded-2xl p-6 w-[90%] max-w-sm shadow-xl z-10 text-center space-y-5">
+
+            <h3 className="text-lg font-semibold">
+              What are you looking for?
+            </h3>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  window.location.href = buildQuery('sale');
+                }}
+                className="flex-1 bg-[#6f4e37] text-white py-3 rounded-xl font-semibold hover:bg-[#5a3f2d]"
+              >
+                Buy
+              </button>
+
+              <button
+                onClick={() => {
+                  window.location.href = buildQuery('rent');
+                }}
+                className="flex-1 bg-[#ede3d5] text-[#6f4e37] py-3 rounded-xl font-semibold"
+              >
+                Rent
+              </button>
+            </div>
+
+            <button
+              onClick={() => setShowModal(false)}
+              className="text-sm text-gray-500 hover:text-black"
+            >
+              Cancel
+            </button>
+
+          </div>
+        </div>
+      )}
+    </>
   );
 }

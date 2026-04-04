@@ -1,5 +1,3 @@
-// app/api/allproperties/route.ts
-
 import { NextResponse } from 'next/server';
 import data from '@/data/data.json';
 import { FullPropertyDetails, PropertyResponse } from '@/types/property';
@@ -8,7 +6,6 @@ export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
 
-    // ---------------- QUERY PARAMS ----------------
     const city = searchParams.get('city');
     const area = searchParams.get('area');
     const listing = searchParams.get('listing');
@@ -17,10 +14,9 @@ export async function GET(req: Request) {
     const bedrooms = searchParams.get('bedrooms');
     const search = searchParams.get('search');
     const subtype = searchParams.get('subtype');
+
     let properties: FullPropertyDetails[] =
       data.properties as FullPropertyDetails[];
-
-    // ---------------- STRUCTURED FILTERS ----------------
 
     if (city) {
       properties = properties.filter(
@@ -58,7 +54,6 @@ export async function GET(req: Request) {
       );
     }
 
-    // ---------------- SUBTYPE FILTER (CORRECT PLACE) ----------------
     if (subtype) {
       properties = properties.filter((p) => {
         if (p.residential_details?.property_subtype === subtype) return true;
@@ -68,7 +63,6 @@ export async function GET(req: Request) {
       });
     }
 
-    // ---------------- SEARCH ----------------
     if (search) {
       const term = search.toLowerCase();
 
@@ -80,7 +74,6 @@ export async function GET(req: Request) {
       );
     }
 
-    // ---------------- RESPONSE ----------------
     const response: PropertyResponse = {
       properties,
     };

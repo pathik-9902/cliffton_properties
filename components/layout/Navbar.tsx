@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 
+// ---------------- TYPES ----------------
 type NavItem = {
   label: string;
   href?: string;
@@ -45,13 +46,13 @@ export default function Navbar() {
 
   const pathname = usePathname();
 
-  // Close menu on route change
+  // ---------------- CLOSE ON ROUTE CHANGE ----------------
   useEffect(() => {
     setMobileOpen(false);
     setMobileSubmenu(null);
   }, [pathname]);
 
-  // Lock background scroll
+  // ---------------- LOCK SCROLL ----------------
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? 'hidden' : 'auto';
   }, [mobileOpen]);
@@ -75,7 +76,6 @@ export default function Navbar() {
 
         {/* DESKTOP NAV */}
         <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
-
           {NAV_ITEMS.map((item) => (
             <div
               key={item.label}
@@ -84,14 +84,11 @@ export default function Navbar() {
               onMouseLeave={() => setOpenDropdown(null)}
             >
               {item.href ? (
-                <Link
-                  href={item.href}
-                  className="text-[#1F1F1F] hover:text-[#6B6B6B] transition"
-                >
+                <Link href={item.href} className="text-[#1F1F1F] hover:text-[#6B6B6B]">
                   {item.label}
                 </Link>
               ) : (
-                <button className="text-[#1F1F1F] hover:text-[#6B6B6B] transition">
+                <button className="text-[#1F1F1F] hover:text-[#6B6B6B]">
                   {item.label}
                 </button>
               )}
@@ -100,10 +97,8 @@ export default function Navbar() {
               {item.children && (
                 <div
                   className={`
-                    absolute left-0 top-full mt-3
-                    w-48 rounded-2xl
-                    bg-white border border-[#E8E2DA]
-                    shadow-lg
+                    absolute left-0 top-full mt-3 w-48 rounded-2xl
+                    bg-white border border-[#E8E2DA] shadow-lg
                     transition-all duration-300
                     ${openDropdown === item.label
                       ? 'opacity-100 visible translate-y-0'
@@ -114,7 +109,7 @@ export default function Navbar() {
                     <Link
                       key={child.href}
                       href={child.href}
-                      className="block px-5 py-3 text-sm text-[#6B6B6B] hover:bg-[#F4EFE9] hover:text-[#1F1F1F] transition"
+                      className="block px-5 py-3 text-sm text-[#6B6B6B] hover:bg-[#F4EFE9]"
                     >
                       {child.label}
                     </Link>
@@ -123,14 +118,13 @@ export default function Navbar() {
               )}
             </div>
           ))}
-
         </nav>
 
         {/* CTA */}
         <div className="hidden md:block">
           <Link
             href="/want-to-list"
-            className="bg-black text-white px-5 py-2 rounded-xl text-sm hover:opacity-90 transition"
+            className="bg-black text-white px-5 py-2 rounded-xl text-sm"
           >
             List Property
           </Link>
@@ -140,15 +134,14 @@ export default function Navbar() {
         <button
           aria-label="Toggle menu"
           aria-expanded={mobileOpen}
-          className="md:hidden text-2xl"
+          className="md:hidden text-2xl z-[60]" // 🔥 ensure above everything
           onClick={() => {
-            setMobileOpen(!mobileOpen);
+            setMobileOpen((prev) => !prev);
             setMobileSubmenu(null);
           }}
         >
           {mobileOpen ? '✕' : '☰'}
         </button>
-
       </div>
 
       {/* OVERLAY */}
@@ -162,22 +155,25 @@ export default function Navbar() {
       {/* MOBILE MENU */}
       <div
         className={`
-          md:hidden border-t border-[#E8E2DA] bg-[#F4EFE9]
-          overflow-hidden transition-all duration-300
-          ${mobileOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'}
+          fixed top-[72px] left-0 w-full
+          bg-[#F4EFE9] border-t border-[#E8E2DA]
+          z-50 md:hidden
+          transition-all duration-300
+          ${mobileOpen
+            ? 'opacity-100 translate-y-0'
+            : 'opacity-0 -translate-y-3 pointer-events-none'}
         `}
       >
-        <nav className="px-6 py-5 space-y-3">
+        <nav className="px-6 py-5 space-y-3 max-h-[calc(100vh-72px)] overflow-y-auto">
 
           {NAV_ITEMS.map((item) => (
             <div key={item.label}>
-
               {item.children ? (
                 <>
                   <button
                     className="w-full flex justify-between py-2 font-medium text-[#1F1F1F]"
                     onClick={() =>
-                      setMobileSubmenu(prev =>
+                      setMobileSubmenu((prev) =>
                         prev === item.label ? null : item.label
                       )
                     }
@@ -194,7 +190,7 @@ export default function Navbar() {
                         <Link
                           key={child.href}
                           href={child.href}
-                          className="block text-sm text-[#6B6B6B] hover:text-[#1F1F1F]"
+                          className="block text-sm text-[#6B6B6B]"
                           onClick={() => {
                             setMobileOpen(false);
                             setMobileSubmenu(null);
@@ -218,24 +214,21 @@ export default function Navbar() {
                   {item.label}
                 </Link>
               )}
-
             </div>
           ))}
 
-          {/* MOBILE CTA */}
+          {/* CTA */}
           <div className="pt-4">
             <Link
               href="/want-to-list"
-              className="block w-full text-center bg-black text-white py-3 rounded-xl text-sm"
+              className="block w-full text-center bg-black text-white py-3 rounded-xl"
               onClick={() => setMobileOpen(false)}
             >
               List Property
             </Link>
           </div>
-
         </nav>
       </div>
-
     </header>
   );
 }

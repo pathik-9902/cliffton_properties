@@ -3,60 +3,47 @@
 import { Home, Building2, LandPlot, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
-type Props = {
-  listingType: 'rent' | 'sale';
-};
-
-export default function CategorySection({ listingType }: Props) {
+export default function CategorySection() {
   const categories = [
     {
       title: 'Residential',
-      icon: <Home />,
-      description: 'Apartments, villas, and homes.',
+      icon: <Home strokeWidth={1.4} />,
+      description: 'Apartments, villas, and private residences.',
       category: 'residential',
     },
     {
       title: 'Commercial',
-      icon: <Building2 />,
-      description: 'Offices, shops, and business spaces.',
+      icon: <Building2 strokeWidth={1.4} />,
+      description: 'Offices, retail shops, and workspaces.',
       category: 'commercial',
     },
     {
       title: 'Land',
-      icon: <LandPlot />,
-      description: 'Plots and development-ready land.',
+      icon: <LandPlot strokeWidth={1.4} />,
+      description: 'Plots, investments, and development land.',
       category: 'land',
     },
   ];
 
   return (
-    <section className="mx-auto max-w-7xl px-6 py-24">
-      
-      <h2 className="text-center text-3xl font-bold text-[#1f1f1f]">
-        Explore by Category
-      </h2>
+    <section className="relative mx-auto max-w-7xl px-6 py-32">
 
-      <p className="mx-auto mt-4 max-w-2xl text-center text-gray-600">
-        Browse verified properties across all major segments.
-      </p>
+      {/* Heading */}
+      <div className="text-center">
+        <h2 className="text-4xl font-semibold tracking-tight text-[#181818]">
+          Explore by Category
+        </h2>
 
-      <div className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-        {categories.map((cat) => {
-          const query = new URLSearchParams({
-            category: cat.category,
-            listing: listingType, // ✅ FIXED
-          }).toString();
+        <p className="mx-auto mt-4 max-w-2xl text-gray-500 text-lg">
+          Curated property segments designed for modern investors and living.
+        </p>
+      </div>
 
-          return (
-            <Card
-              key={cat.title}
-              icon={cat.icon}
-              title={cat.title}
-              description={cat.description}
-              href={`/properties?${query}`}
-            />
-          );
-        })}
+      {/* Grid */}
+      <div className="mt-20 grid gap-12 sm:grid-cols-2 lg:grid-cols-3">
+        {categories.map((cat) => (
+          <Card key={cat.title} {...cat} />
+        ))}
       </div>
     </section>
   );
@@ -66,29 +53,62 @@ function Card({
   icon,
   title,
   description,
-  href,
+  category,
 }: {
   icon: React.ReactNode;
   title: string;
   description: string;
-  href: string;
+  category: string;
 }) {
+  // ✅ Correct segment-based routes
+  const rentUrl = `/properties/${category}/listing/rent`;
+  const saleUrl = `/properties/${category}/listing/sale`;
+
   return (
-    <Link
-      href={href}
-      className="group rounded-2xl border border-[#efe6dc] bg-white p-8 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
-    >
-      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#ede3d5] text-[#6f4e37]">
+    <div className="group relative overflow-hidden rounded-[28px] border border-white/40 bg-white/70 backdrop-blur-xl p-8 shadow-[0_8px_40px_rgba(0,0,0,0.06)] transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_80px_rgba(0,0,0,0.12)]">
+
+      {/* Ambient gradient */}
+      <div className="absolute inset-0 opacity-0 transition duration-500 group-hover:opacity-100 bg-gradient-to-br from-[#faf7f2] via-transparent to-[#f3ede7]" />
+
+      {/* Icon */}
+      <div className="relative mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#f4eee6] text-[#6f4e37] transition-transform duration-300 group-hover:scale-105">
         {icon}
       </div>
 
-      <h3 className="text-lg font-bold text-[#1f1f1f]">{title}</h3>
-      <p className="mt-2 text-sm text-gray-600">{description}</p>
+      {/* Content */}
+      <h3 className="relative text-xl font-medium text-[#181818]">
+        {title}
+      </h3>
 
-      <span className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-[#6f4e37]">
-        Explore
-        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-      </span>
-    </Link>
+      <p className="relative mt-3 text-sm text-gray-500 leading-relaxed">
+        {description}
+      </p>
+
+      {/* Divider */}
+      <div className="my-7 h-px w-full bg-gradient-to-r from-transparent via-[#e7dfd6] to-transparent" />
+
+      {/* Actions */}
+      <div className="relative grid grid-cols-2 gap-3">
+
+        {/* Rent */}
+        <Link
+          href={rentUrl}
+          className="group/btn flex items-center justify-center gap-2 rounded-xl border border-[#e5ddd5] bg-white/80 backdrop-blur px-4 py-3 text-sm font-medium text-[#1a1a1a] transition-all duration-300 hover:border-[#cbb8a6] hover:bg-[#f8f5f1]"
+        >
+          Rent
+          <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1" />
+        </Link>
+
+        {/* Buy */}
+        <Link
+          href={saleUrl}
+          className="group/btn flex items-center justify-center gap-2 rounded-xl border border-[#e5ddd5] bg-white/80 backdrop-blur px-4 py-3 text-sm font-medium text-[#1a1a1a] transition-all duration-300 hover:border-[#cbb8a6] hover:bg-[#f8f5f1]"
+        >
+          Buy
+          <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1" />
+        </Link>
+
+      </div>
+    </div>
   );
 }
