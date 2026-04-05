@@ -4,10 +4,18 @@ import { useState } from 'react';
 import { SEARCH_SUGGESTIONS } from '@/lib/config/searchData';
 import { X } from 'lucide-react';
 
+type CategoryType = 'residential' | 'commercial' | 'land';
+type DealType = 'rent' | 'sale';
+
 type Props = {
   open: boolean;
   onClose: () => void;
-  onSearch: (data: any) => void;
+  onSearch: (data: {
+    category: CategoryType;
+    type: DealType;
+    city: string;
+    area: string;
+  }) => void;
 };
 
 export default function PropertySearchModal({
@@ -15,8 +23,8 @@ export default function PropertySearchModal({
   onClose,
   onSearch,
 }: Props) {
-  const [type, setType] = useState('residential');
-  const [category, setCategory] = useState('rent');
+  const [category, setCategory] = useState<CategoryType>('residential');
+  const [type, setType] = useState<DealType>('sale');
   const [city, setCity] = useState('');
   const [area, setArea] = useState('');
 
@@ -27,15 +35,17 @@ export default function PropertySearchModal({
 
   const chipBase =
     'px-4 py-2 rounded-full border text-sm font-medium transition-all cursor-pointer';
+
   const activeChip =
     'bg-[#6f4e37] text-white border-[#6f4e37] shadow-md';
+
   const inactiveChip =
     'bg-white text-gray-700 border-gray-200 hover:border-[#6f4e37] hover:text-[#6f4e37]';
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="relative w-full max-w-2xl rounded-3xl bg-white/90 backdrop-blur-xl p-8 shadow-2xl border border-white/20 animate-fadeIn">
-        
+      <div className="relative w-full max-w-2xl rounded-3xl bg-white/90 backdrop-blur-xl p-6 sm:p-8 shadow-2xl border border-white/20 animate-fadeIn">
+
         {/* Close */}
         <button
           onClick={onClose}
@@ -45,8 +55,8 @@ export default function PropertySearchModal({
         </button>
 
         {/* Heading */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900">
+        <div className="mb-6 sm:mb-8">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
             Find Your Perfect Property
           </h2>
           <p className="text-gray-500 text-sm mt-1">
@@ -54,33 +64,13 @@ export default function PropertySearchModal({
           </p>
         </div>
 
-        {/* Property Type */}
+        {/* CATEGORY (Residential / Commercial / Land) */}
         <div className="mb-6">
           <p className="font-semibold mb-3 text-gray-800">
-            Property Type
+            Property Category
           </p>
           <div className="flex flex-wrap gap-3">
-            {['residential', 'commercial', 'land'].map((t) => (
-              <button
-                key={t}
-                onClick={() => setType(t)}
-                className={`${chipBase} ${
-                  type === t ? activeChip : inactiveChip
-                }`}
-              >
-                {t.charAt(0).toUpperCase() + t.slice(1)}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Category */}
-        <div className="mb-6">
-          <p className="font-semibold mb-3 text-gray-800">
-            Looking For
-          </p>
-          <div className="flex gap-3">
-            {['rent', 'sale'].map((c) => (
+            {(['residential', 'commercial', 'land'] as CategoryType[]).map((c) => (
               <button
                 key={c}
                 onClick={() => setCategory(c)}
@@ -88,7 +78,27 @@ export default function PropertySearchModal({
                   category === c ? activeChip : inactiveChip
                 }`}
               >
-                {c === 'rent' ? 'Rent' : 'Buy'}
+                {c.charAt(0).toUpperCase() + c.slice(1)}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* TYPE (Rent / Buy) */}
+        <div className="mb-6">
+          <p className="font-semibold mb-3 text-gray-800">
+            Looking For
+          </p>
+          <div className="flex gap-3">
+            {(['rent', 'sale'] as DealType[]).map((t) => (
+              <button
+                key={t}
+                onClick={() => setType(t)}
+                className={`${chipBase} ${
+                  type === t ? activeChip : inactiveChip
+                }`}
+              >
+                {t === 'rent' ? 'Rent' : 'Buy'}
               </button>
             ))}
           </div>
@@ -116,7 +126,7 @@ export default function PropertySearchModal({
         </div>
 
         {/* Area */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <p className="font-semibold mb-3 text-gray-800">
             Area (Optional)
           </p>
@@ -148,7 +158,12 @@ export default function PropertySearchModal({
 
           <button
             onClick={() =>
-              onSearch({ type, category, city, area })
+              onSearch({
+                category,
+                type,
+                city,
+                area,
+              })
             }
             className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#6f4e37] to-[#c6a15b] text-white font-semibold shadow-lg hover:scale-[1.03] transition-all"
           >
