@@ -33,7 +33,7 @@
     {
       "id": "COMM-DET-3",
       "property_id": "COMM-00009",
-      "commercial_subtype": "warehouse",
+      "commercial_subtype": "workspace",
       "floor": "Ground",
       "washrooms": 1,
       "built_up_area": 6000,

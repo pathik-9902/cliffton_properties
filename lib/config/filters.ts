@@ -167,7 +167,7 @@ export const FILTERS_CONFIG: FiltersConfigType = {
         { label: 'All Types', value: '' },
         { label: 'Office', value: 'office' },
         { label: 'Showroom', value: 'showroom' },
-        { label: 'Warehouse', value: 'warehouse' },
+        { label: 'Workspace', value: 'workspace' },
       ],
     },
 

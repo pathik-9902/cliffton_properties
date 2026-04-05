@@ -35,10 +35,10 @@ export default function PropertyTypeSection() {
       subtype: 'showroom',
     },
     {
-      title: 'Warehouses',
+      title: 'Workspaces',
       icon: <Warehouse />,
       category: 'commercial',
-      subtype: 'warehouse',
+      subtype: 'workspace',
     },
     {
       title: 'Plots',

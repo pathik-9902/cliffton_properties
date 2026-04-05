@@ -58,7 +58,7 @@ export default function CategorySection() {
     commercial: [
       { name: 'office', label: 'Office' },
       { name: 'shop', label: 'Shop' },
-      { name: 'warehouse', label: 'Warehouse' },
+      { name: 'workspace', label: 'Workspace' },
     ],
     land: [
       { name: 'agricultural_land', label: 'Agricultural Land' },
