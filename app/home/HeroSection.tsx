@@ -75,9 +75,9 @@ export default function HeroSection(): React.ReactNode {
     city: string;
     area?: string;
   }) => {
-    const { type, category, city, area } = data;
+    const { category, city, area } = data;
 
-    let url = `/properties/${type}/listing/${category}?city=${city}`;
+    let url = `/properties/${category}?city=${city}`;
 
     if (area) {
       url += `&area=${area}`;
