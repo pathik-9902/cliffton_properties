@@ -23,10 +23,8 @@ type ApiResponse = {
 
 export default function ListingClient({
   category,
-  type,
 }: {
   category: string;
-  type: string;
 }) {
   const searchParams = useSearchParams();
   const searchString = searchParams.toString();
@@ -34,8 +32,6 @@ export default function ListingClient({
   const [response, setResponse] = useState<ApiResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
-
-  /* ✅ ALWAYS RUN HOOKS IN SAME ORDER */
 
   const filters = useMemo(() => {
     const obj: Record<string, string> = {};
@@ -61,8 +57,7 @@ export default function ListingClient({
       try {
         const query = new URLSearchParams({
           category,
-          type,
-          ...filters,
+          ...filters, // ✅ removed type
         });
 
         const res = await fetch(`/api/properties?${query.toString()}`, {
@@ -83,17 +78,13 @@ export default function ListingClient({
     fetchProperties();
 
     return () => controller.abort();
-  }, [category, type, filters]);
+  }, [category, filters]); // ✅ removed type dependency
 
   const properties = response?.data || [];
   const meta = response?.meta;
 
-  /* ✅ SAFE RENDER */
-
   if (!mounted) {
-    return (
-      <section className="bg-[#F4EFE9] min-h-screen" />
-    );
+    return <section className="bg-[#F4EFE9] min-h-screen" />;
   }
 
   return (
@@ -103,7 +94,7 @@ export default function ListingClient({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 flex justify-between items-center">
           <div>
             <h1 className="text-2xl sm:text-3xl font-semibold capitalize tracking-tight">
-              {category} for {type}
+              {category} listings
             </h1>
 
             <p className="text-sm text-[#6B6B6B] mt-1">

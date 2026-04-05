@@ -1,0 +1,49 @@
+{
+  "commercial_details": [
+    {
+      "id": "COMM-DET-1",
+      "property_id": "COMM-00003",
+      "commercial_subtype": "office",
+      "floor": "5th",
+      "washrooms": 2,
+      "built_up_area": 2200,
+      "maintenance_charges": 5000,
+      "pantry": true,
+      "meeting_rooms": 2,
+      "central_air_conditioning": true,
+      "passenger_lift": true,
+      "service_lift": false,
+      "frontage_width": 30
+    },
+    {
+      "id": "COMM-DET-2",
+      "property_id": "COMM-00006",
+      "commercial_subtype": "showroom",
+      "floor": "Ground",
+      "washrooms": 1,
+      "built_up_area": 3000,
+      "maintenance_charges": 6500,
+      "pantry": false,
+      "meeting_rooms": 0,
+      "central_air_conditioning": true,
+      "passenger_lift": false,
+      "service_lift": false,
+      "frontage_width": 45
+    },
+    {
+      "id": "COMM-DET-3",
+      "property_id": "COMM-00009",
+      "commercial_subtype": "warehouse",
+      "floor": "Ground",
+      "washrooms": 1,
+      "built_up_area": 6000,
+      "maintenance_charges": 8000,
+      "pantry": false,
+      "meeting_rooms": 0,
+      "central_air_conditioning": false,
+      "passenger_lift": false,
+      "service_lift": true,
+      "frontage_width": 70
+    }
+  ]
+}

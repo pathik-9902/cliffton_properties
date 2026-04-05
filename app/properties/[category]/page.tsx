@@ -7,7 +7,7 @@ export default async function ListingPage({
 }: {
   params: Promise<{ category: string; type: string }>;
 }) {
-  const { category, type } = await params;
+  const { category } = await params; // ✅ ignore `type`
 
   return (
     <main className="bg-[#F4EFE9] min-h-screen">
@@ -19,8 +19,7 @@ export default async function ListingPage({
         {/* CONTENT */}
         <div className="relative z-10">
           <ListingClient
-            category={category}
-            type={type}
+            category={category} // ✅ only category passed
           />
         </div>
       </div>

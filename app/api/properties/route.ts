@@ -1,9 +1,14 @@
 import { NextResponse } from 'next/server';
-import data from '@/data/data.json';
+
+import propertiesData from '@/data/properties.json';
+import imagesData from '@/data/property_images.json';
+import residentialData from '@/data/residential_details.json';
+import commercialData from '@/data/commercial_details.json';
+import landData from '@/data/land_details.json';
 
 /* ---------------- TYPES ---------------- */
 
-type Property = (typeof data.properties)[number];
+type Property = ReturnType<typeof buildProperties>[number];
 
 /* ---------------- HELPERS ---------------- */
 
@@ -18,6 +23,39 @@ const parseBoolean = (value: string | null) => {
   return value === 'true';
 };
 
+/* ---------------- BUILD JOINED DATA ---------------- */
+
+function buildProperties() {
+  const residentialMap = new Map(
+    residentialData.residential_details.map((r) => [r.property_id, r])
+  );
+
+  const commercialMap = new Map(
+    commercialData.commercial_details.map((c) => [c.property_id, c])
+  );
+
+  const landMap = new Map(
+    landData.land_details.map((l) => [l.property_id, l])
+  );
+
+  const imagesMap = new Map<string, any[]>();
+
+  imagesData.property_images.forEach((img) => {
+    if (!imagesMap.has(img.property_id)) {
+      imagesMap.set(img.property_id, []);
+    }
+    imagesMap.get(img.property_id)!.push(img);
+  });
+
+  return propertiesData.properties.map((p) => ({
+    ...p,
+    images: imagesMap.get(p.id) || [],
+    residential_details: residentialMap.get(p.id),
+    commercial_details: commercialMap.get(p.id),
+    land_details: landMap.get(p.id),
+  }));
+}
+
 /* ---------------- FILTER ENGINE ---------------- */
 
 function applyFilters(
@@ -25,7 +63,9 @@ function applyFilters(
   searchParams: URLSearchParams
 ) {
   const category = searchParams.get('category');
-  const type = searchParams.get('type');
+
+  // ✅ DEFAULT SALE (IMPORTANT)
+  const type = searchParams.get('type') || 'sale';
 
   const minPrice = parseNumber(searchParams.get('minPrice'));
   const maxPrice = parseNumber(searchParams.get('maxPrice'));
@@ -36,12 +76,14 @@ function applyFilters(
   const search = searchParams.get('search');
 
   return properties.filter((p) => {
-    /* ---------------- CORE ---------------- */
+    /* ---------- CORE ---------- */
 
     if (category && p.category !== category) return false;
-    if (type && p.listing_type !== type) return false;
 
-    /* ---------------- SEARCH ---------------- */
+    // ✅ TYPE FILTER (MANDATORY)
+    if (p.listing_type !== type) return false;
+
+    /* ---------- SEARCH ---------- */
 
     if (search) {
       const s = search.toLowerCase();
@@ -54,17 +96,17 @@ function applyFilters(
       }
     }
 
-    /* ---------------- PRICE ---------------- */
+    /* ---------- PRICE ---------- */
 
     if (minPrice !== undefined && p.price < minPrice) return false;
     if (maxPrice !== undefined && p.price > maxPrice) return false;
 
-    /* ---------------- FLAGS ---------------- */
+    /* ---------- FLAGS ---------- */
 
     if (verified !== undefined && p.verified !== verified) return false;
     if (featured !== undefined && p.is_featured !== featured) return false;
 
-    /* ---------------- LOCATION ---------------- */
+    /* ---------- LOCATION ---------- */
 
     if (searchParams.get('city') && p.city !== searchParams.get('city'))
       return false;
@@ -73,7 +115,7 @@ function applyFilters(
       return false;
 
     /* =======================================================
-       🔥 CATEGORY-SPECIFIC FILTERS
+       CATEGORY-SPECIFIC FILTERS
     ======================================================= */
 
     /* ---------- RESIDENTIAL ---------- */
@@ -154,10 +196,7 @@ function applyFilters(
 
 /* ---------------- SORTING ---------------- */
 
-function applySorting(
-  properties: Property[],
-  sort: string | null
-) {
+function applySorting(properties: Property[], sort: string | null) {
   if (!sort) return properties;
 
   const sorted = [...properties];
@@ -199,7 +238,7 @@ function applyPagination(
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
 
-  const allProperties: Property[] = data.properties;
+  const allProperties = buildProperties();
 
   /* ---------- SINGLE PROPERTY ---------- */
   const id = searchParams.get('id');
@@ -216,10 +255,7 @@ export async function GET(request: Request) {
   const filtered = applyFilters(allProperties, searchParams);
 
   /* ---------- SORT ---------- */
-  const sorted = applySorting(
-    filtered,
-    searchParams.get('sort')
-  );
+  const sorted = applySorting(filtered, searchParams.get('sort'));
 
   /* ---------- PAGINATION ---------- */
   const page = parseNumber(searchParams.get('page')) || 1;

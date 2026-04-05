@@ -20,8 +20,6 @@ type Props = {
   initialFilters?: Record<string, string>;
 };
 
-/* ---------------- COMPONENT ---------------- */
-
 export default function Filters({
   category,
   initialFilters = {},
@@ -54,57 +52,50 @@ export default function Filters({
 
   useEffect(() => {
     const params = new URLSearchParams(searchString);
-    const paramsObj: Record<string, string> = {};
+    const obj: Record<string, string> = {};
 
     params.forEach((value, key) => {
-      paramsObj[key] = value;
+      obj[key] = value;
     });
 
-    const next = JSON.stringify(paramsObj);
-    const current = JSON.stringify(filters);
+    if (!obj.type) obj.type = 'sale'; // ✅ default
 
-    if (next === current) return;
-
-    setFilters(paramsObj);
-    setMinPrice(paramsObj.minPrice || '');
-    setMaxPrice(paramsObj.maxPrice || '');
+    setFilters(obj);
+    setMinPrice(obj.minPrice || '');
+    setMaxPrice(obj.maxPrice || '');
   }, [searchString]);
 
   /* ---------------- UPDATE URL ---------------- */
 
   const updateURL = useCallback(
-    (nextFilters: Record<string, string>) => {
+    (next: Record<string, string>) => {
       const params = new URLSearchParams();
 
-      Object.entries(nextFilters).forEach(([key, value]) => {
-        if (value) params.set(key, value);
+      Object.entries(next).forEach(([key, value]) => {
+        if (!value && key !== 'type') return;
+        params.set(key, value || 'sale');
       });
 
-      const nextQuery = params.toString();
+      const query = params.toString();
 
-      if (prevQueryRef.current === nextQuery) return;
-      prevQueryRef.current = nextQuery;
+      if (prevQueryRef.current === query) return;
+      prevQueryRef.current = query;
 
       startTransition(() => {
-        router.replace(`?${nextQuery}`, { scroll: false });
+        router.replace(`?${query}`, { scroll: false });
       });
     },
     [router]
   );
 
-  /* ---------------- FIELD UPDATE ---------------- */
+  /* ---------------- UPDATE FIELD ---------------- */
 
   const updateField = useCallback((key: string, value: string) => {
-    setFilters((prev) => {
-      const updated = { ...prev };
-
-      if (value) updated[key] = value;
-      else delete updated[key];
-
-      updated.page = '';
-
-      return updated;
-    });
+    setFilters((prev) => ({
+      ...prev,
+      [key]: value,
+      page: '',
+    }));
   }, []);
 
   /* ---------------- DEBOUNCE ---------------- */
@@ -115,7 +106,7 @@ export default function Filters({
       return;
     }
 
-    const handler = setTimeout(() => {
+    const t = setTimeout(() => {
       updateURL({
         ...filters,
         minPrice,
@@ -123,22 +114,22 @@ export default function Filters({
       });
     }, 250);
 
-    return () => clearTimeout(handler);
+    return () => clearTimeout(t);
   }, [filters, minPrice, maxPrice, updateURL]);
 
   /* ---------------- CLEAR ---------------- */
 
-  const clearFilters = useCallback(() => {
+  const clearFilters = () => {
     prevQueryRef.current = '';
 
-    setFilters({});
+    const base = { type: 'sale' };
+
+    setFilters(base);
     setMinPrice('');
     setMaxPrice('');
 
-    startTransition(() => {
-      router.replace('?', { scroll: false });
-    });
-  }, [router]);
+    router.replace('?type=sale');
+  };
 
   const activeCount =
     Object.keys(filters).filter((k) => filters[k]).length +
@@ -147,18 +138,17 @@ export default function Filters({
   /* ---------------- UI ---------------- */
 
   return (
-    <div className="bg-white rounded-3xl border border-[#E8E2DA] shadow-sm p-6 space-y-8">
+    <div className="backdrop-blur-xl bg-white/80 border border-[#E8E2DA] shadow-xl rounded-[28px] p-6 space-y-8">
 
       {/* HEADER */}
       <div className="flex justify-between items-start">
         <div>
-          <h2 className="font-semibold text-lg text-[#1F1F1F]">
+          <h2 className="text-lg font-semibold tracking-tight">
             Filters
           </h2>
-
           {activeCount > 0 && (
             <p className="text-xs text-[#6B6B6B] mt-1">
-              {activeCount} active filters
+              {activeCount} active
             </p>
           )}
         </div>
@@ -168,18 +158,43 @@ export default function Filters({
             onClick={clearFilters}
             className="text-xs text-[#C9A24D] hover:underline"
           >
-            Clear all
+            Reset
           </button>
         )}
       </div>
 
+      {/* 🔥 PREMIUM SEGMENTED CONTROL */}
+      <div className="space-y-3">
+        <label className="text-sm font-medium">Listing Type</label>
+
+        <div className="relative flex bg-[#F4EFE9] p-1 rounded-2xl">
+          {['sale', 'rent'].map((t) => {
+            const active = (filters.type || 'sale') === t;
+
+            return (
+              <button
+                key={t}
+                onClick={() => updateField('type', t)}
+                className={`
+                  relative z-10 flex-1 py-2 text-sm font-medium rounded-xl transition-all duration-300
+                  ${active
+                    ? 'bg-white shadow text-black'
+                    : 'text-[#6B6B6B]'}
+                `}
+              >
+                {t === 'sale' ? 'Sale' : 'Rent'}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* FILTER GROUPS */}
       {config.map((filter) => {
-        /* PRICE */
         if (filter.type === 'price') {
           return (
             <div key="price" className="space-y-3">
-              <label className="text-sm font-medium text-[#1F1F1F]">
+              <label className="text-sm font-medium">
                 {filter.label}
               </label>
 
@@ -189,7 +204,7 @@ export default function Filters({
                   placeholder="Min ₹"
                   value={minPrice}
                   onChange={(e) => setMinPrice(e.target.value)}
-                  className="w-full border border-[#E8E2DA] bg-[#F4EFE9] p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#C9A24D]/30 transition"
+                  className="w-full bg-[#F4EFE9] border border-transparent focus:border-[#C9A24D]/40 focus:ring-2 focus:ring-[#C9A24D]/20 rounded-xl p-3 text-sm transition"
                 />
 
                 <input
@@ -197,17 +212,16 @@ export default function Filters({
                   placeholder="Max ₹"
                   value={maxPrice}
                   onChange={(e) => setMaxPrice(e.target.value)}
-                  className="w-full border border-[#E8E2DA] bg-[#F4EFE9] p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#C9A24D]/30 transition"
+                  className="w-full bg-[#F4EFE9] border border-transparent focus:border-[#C9A24D]/40 focus:ring-2 focus:ring-[#C9A24D]/20 rounded-xl p-3 text-sm transition"
                 />
               </div>
             </div>
           );
         }
 
-        /* SELECT */
         return (
           <div key={filter.key} className="space-y-3">
-            <label className="text-sm font-medium text-[#1F1F1F]">
+            <label className="text-sm font-medium">
               {filter.label}
             </label>
 
@@ -217,7 +231,7 @@ export default function Filters({
                 onChange={(e) =>
                   updateField(filter.key, e.target.value)
                 }
-                className="w-full border border-[#E8E2DA] bg-[#F4EFE9] p-3 rounded-xl text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-[#C9A24D]/30 transition"
+                className="w-full bg-[#F4EFE9] border border-transparent focus:border-[#C9A24D]/40 focus:ring-2 focus:ring-[#C9A24D]/20 rounded-xl p-3 text-sm appearance-none transition"
               >
                 <option value="">All</option>
 
@@ -228,7 +242,7 @@ export default function Filters({
                 ))}
               </select>
 
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B6B6B] text-xs">
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#6B6B6B]">
                 ▼
               </span>
             </div>

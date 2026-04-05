@@ -15,33 +15,26 @@ type NavItem = {
 const NAV_ITEMS: NavItem[] = [
   { label: 'Home', href: '/' },
   { label: 'About Us', href: '/about' },
+
+  // ✅ CLEAN CATEGORY NAV (NO TYPE)
   {
     label: 'Residential',
-    children: [
-      { label: 'Rent', href: '/properties/residential/listing/rent' },
-      { label: 'Sale', href: '/properties/residential/listing/sale' },
-    ],
+    href: '/properties/residential',
   },
   {
     label: 'Commercial',
-    children: [
-      { label: 'Rent', href: '/properties/commercial/listing/rent' },
-      { label: 'Sale', href: '/properties/commercial/listing/sale' },
-    ],
+    href: '/properties/commercial',
   },
   {
     label: 'Land',
-    children: [
-      { label: 'Rent', href: '/properties/land/listing/rent' },
-      { label: 'Sale', href: '/properties/land/listing/sale' },
-    ],
+    href: '/properties/land',
   },
+
   { label: 'Contact Us', href: '/contact' },
 ];
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [mobileSubmenu, setMobileSubmenu] = useState<string | null>(null);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   const pathname = usePathname();
@@ -49,7 +42,6 @@ export default function Navbar() {
   // ---------------- CLOSE ON ROUTE CHANGE ----------------
   useEffect(() => {
     setMobileOpen(false);
-    setMobileSubmenu(null);
   }, [pathname]);
 
   // ---------------- LOCK SCROLL ----------------
@@ -59,7 +51,6 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 backdrop-blur-xl bg-[#F4EFE9]/80 border-b border-[#E8E2DA]">
-
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-4 flex items-center justify-between">
 
         {/* LOGO */}
@@ -77,45 +68,13 @@ export default function Navbar() {
         {/* DESKTOP NAV */}
         <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
           {NAV_ITEMS.map((item) => (
-            <div
-              key={item.label}
-              className="relative"
-              onMouseEnter={() => setOpenDropdown(item.label)}
-              onMouseLeave={() => setOpenDropdown(null)}
-            >
-              {item.href ? (
-                <Link href={item.href} className="text-[#1F1F1F] hover:text-[#6B6B6B]">
-                  {item.label}
-                </Link>
-              ) : (
-                <button className="text-[#1F1F1F] hover:text-[#6B6B6B]">
-                  {item.label}
-                </button>
-              )}
-
-              {/* DROPDOWN */}
-              {item.children && (
-                <div
-                  className={`
-                    absolute left-0 top-full mt-3 w-48 rounded-2xl
-                    bg-white border border-[#E8E2DA] shadow-lg
-                    transition-all duration-300
-                    ${openDropdown === item.label
-                      ? 'opacity-100 visible translate-y-0'
-                      : 'opacity-0 invisible translate-y-2'}
-                  `}
-                >
-                  {item.children.map((child) => (
-                    <Link
-                      key={child.href}
-                      href={child.href}
-                      className="block px-5 py-3 text-sm text-[#6B6B6B] hover:bg-[#F4EFE9]"
-                    >
-                      {child.label}
-                    </Link>
-                  ))}
-                </div>
-              )}
+            <div key={item.label} className="relative">
+              <Link
+                href={item.href!}
+                className="text-[#1F1F1F] hover:text-[#6B6B6B]"
+              >
+                {item.label}
+              </Link>
             </div>
           ))}
         </nav>
@@ -134,11 +93,8 @@ export default function Navbar() {
         <button
           aria-label="Toggle menu"
           aria-expanded={mobileOpen}
-          className="md:hidden text-2xl z-[60]" // 🔥 ensure above everything
-          onClick={() => {
-            setMobileOpen((prev) => !prev);
-            setMobileSubmenu(null);
-          }}
+          className="md:hidden text-2xl z-[60]"
+          onClick={() => setMobileOpen((prev) => !prev)}
         >
           {mobileOpen ? '✕' : '☰'}
         </button>
@@ -167,54 +123,14 @@ export default function Navbar() {
         <nav className="px-6 py-5 space-y-3 max-h-[calc(100vh-72px)] overflow-y-auto">
 
           {NAV_ITEMS.map((item) => (
-            <div key={item.label}>
-              {item.children ? (
-                <>
-                  <button
-                    className="w-full flex justify-between py-2 font-medium text-[#1F1F1F]"
-                    onClick={() =>
-                      setMobileSubmenu((prev) =>
-                        prev === item.label ? null : item.label
-                      )
-                    }
-                  >
-                    {item.label}
-                    <span>
-                      {mobileSubmenu === item.label ? '−' : '+'}
-                    </span>
-                  </button>
-
-                  {mobileSubmenu === item.label && (
-                    <div className="pl-4 space-y-2">
-                      {item.children.map((child) => (
-                        <Link
-                          key={child.href}
-                          href={child.href}
-                          className="block text-sm text-[#6B6B6B]"
-                          onClick={() => {
-                            setMobileOpen(false);
-                            setMobileSubmenu(null);
-                          }}
-                        >
-                          {child.label}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </>
-              ) : (
-                <Link
-                  href={item.href!}
-                  className="block py-2 font-medium text-[#1F1F1F]"
-                  onClick={() => {
-                    setMobileOpen(false);
-                    setMobileSubmenu(null);
-                  }}
-                >
-                  {item.label}
-                </Link>
-              )}
-            </div>
+            <Link
+              key={item.label}
+              href={item.href!}
+              className="block py-2 font-medium text-[#1F1F1F]"
+              onClick={() => setMobileOpen(false)}
+            >
+              {item.label}
+            </Link>
           ))}
 
           {/* CTA */}
