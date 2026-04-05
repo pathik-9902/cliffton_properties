@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import PropertySearchModal from '@/components/property/ProopertySearchModal';
+import PropertySearchModal from '@/components/property/PropertySearchModal';
 
 const CAROUSEL_SLIDES = [
   {

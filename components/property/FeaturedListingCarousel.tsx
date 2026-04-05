@@ -51,20 +51,20 @@ export default function FeaturedListingCarousel({ properties }: Props) {
 
   // ---------------- SAFE IMAGE ----------------
   const getImageSrc = (images: any[]) => {
-  if (!images?.length) return '/placeholder.png';
+    if (!images?.length) return '/placeholder.png';
 
-  const first = images[0];
+    const first = images[0];
 
-  if (typeof first === 'string') return first;
+    if (typeof first === 'string') return first;
 
-  if (typeof first === 'object') {
-    if (first.image_url) return first.image_url; // ✅ FIX
-    if (first.url) return first.url;
-    if (first.src) return first.src;
-  }
+    if (typeof first === 'object') {
+      if (first.image_url) return first.image_url; // ✅ FIX
+      if (first.url) return first.url;
+      if (first.src) return first.src;
+    }
 
-  return '/placeholder.png';
-};
+    return '/placeholder.png';
+  };
 
   // ---------------- PRELOAD ----------------
   useEffect(() => {
@@ -116,11 +116,7 @@ export default function FeaturedListingCarousel({ properties }: Props) {
     <div
       className="
         relative 
-        h-44 
-        sm:h-52 
-        md:h-64 
-        lg:h-72 
-        xl:h-80 
+        h-48 sm:h-56 md:h-72 lg:h-[420px] xl:h-[520px] 2xl:h-[600px]
         rounded-xl 
         overflow-hidden 
         group 
@@ -193,11 +189,10 @@ export default function FeaturedListingCarousel({ properties }: Props) {
               e.stopPropagation(); // 🔥 important
               setIndex(i);
             }}
-            className={`transition-all h-1.5 rounded-full ${
-              i === index
+            className={`transition-all h-1.5 rounded-full ${i === index
                 ? 'w-4 bg-white'
                 : 'w-1.5 bg-white/50'
-            }`}
+              }`}
           />
         ))}
       </div>
