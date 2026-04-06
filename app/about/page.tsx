@@ -73,7 +73,6 @@ export default function AboutPage() {
               sizes="(max-width: 768px) 100vw, 50vw"
             />
 
-            {/* overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
           </div>
         </div>
@@ -124,21 +123,35 @@ export default function AboutPage() {
         <div className="mx-auto max-w-7xl px-6 py-20 text-center">
 
           <h2 className="text-3xl sm:text-4xl font-semibold">
-            Ready to Find Your Next Property?
+            Ready to Take the Next Step?
           </h2>
 
           <p className="mx-auto mt-4 max-w-xl text-[#6B6B6B]">
-            Explore verified listings across residential, commercial, and land
-            categories — designed for clarity and confidence.
+            Whether you're looking to explore properties, list your own, or get in touch —
+            we’re here to help you every step of the way.
           </p>
 
-          <div className="mt-8 flex justify-center">
+          <div className="mt-8 flex justify-center gap-4 flex-wrap">
             <a
               href="/properties"
               className="group inline-flex items-center gap-2 rounded-2xl bg-black px-6 py-3 text-sm font-medium text-white transition-all duration-300 hover:opacity-90 hover:scale-[1.02]"
             >
               Browse Properties
               <ArrowRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
+            </a>
+
+            <a
+              href="/want-to-list"
+              className="inline-flex items-center gap-2 rounded-2xl border border-[#1F1F1F] px-6 py-3 text-sm font-medium transition-all duration-300 hover:bg-black hover:text-white"
+            >
+              List Property
+            </a>
+
+            <a
+              href="/contact"
+              className="inline-flex items-center gap-2 rounded-2xl border border-[#1F1F1F] px-6 py-3 text-sm font-medium transition-all duration-300 hover:bg-black hover:text-white"
+            >
+              Contact
             </a>
           </div>
         </div>
