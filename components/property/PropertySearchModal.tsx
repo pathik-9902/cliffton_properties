@@ -7,11 +7,17 @@ import { X } from 'lucide-react';
 type CategoryType = 'residential' | 'commercial' | 'land';
 type DealType = 'rent' | 'sale';
 
+type SubCategory = {
+  name: string;
+  label: string;
+};
+
 type Props = {
   open: boolean;
   onClose: () => void;
   onSearch: (data: {
     category: CategoryType;
+    subCategory: string;
     type: DealType;
     city: string;
     area: string;
@@ -24,6 +30,7 @@ export default function PropertySearchModal({
   onSearch,
 }: Props) {
   const [category, setCategory] = useState<CategoryType>('residential');
+  const [subCategory, setSubCategory] = useState<string>('villa');
   const [type, setType] = useState<DealType>('sale');
   const [city, setCity] = useState('');
   const [area, setArea] = useState('');
@@ -32,6 +39,26 @@ export default function PropertySearchModal({
 
   const areas = SEARCH_SUGGESTIONS.filter((s) => s.type === 'area');
   const cities = SEARCH_SUGGESTIONS.filter((s) => s.type === 'city');
+
+  // ✅ CATEGORY MAP
+  const categoryMap: Record<CategoryType, SubCategory[]> = {
+    residential: [
+      { name: 'villa', label: 'Villa' },
+      { name: 'bungalow', label: 'Bungalow' },
+      { name: 'farmhouse', label: 'Farmhouse' },
+      { name: 'apartment', label: 'Apartment' },
+    ],
+    commercial: [
+      { name: 'office', label: 'Office' },
+      { name: 'shop', label: 'Shop' },
+      { name: 'workspace', label: 'Workspace' },
+    ],
+    land: [
+      { name: 'agricultural_land', label: 'Agricultural Land' },
+      { name: 'industrial_plot', label: 'Industrial Plot' },
+      { name: 'residential_plot', label: 'Residential Plot' },
+    ],
+  };
 
   const chipBase =
     'px-4 py-2 rounded-full border text-sm font-medium transition-all cursor-pointer';
@@ -64,7 +91,7 @@ export default function PropertySearchModal({
           </p>
         </div>
 
-        {/* CATEGORY (Residential / Commercial / Land) */}
+        {/* CATEGORY */}
         <div className="mb-6">
           <p className="font-semibold mb-3 text-gray-800">
             Property Category
@@ -73,7 +100,10 @@ export default function PropertySearchModal({
             {(['residential', 'commercial', 'land'] as CategoryType[]).map((c) => (
               <button
                 key={c}
-                onClick={() => setCategory(c)}
+                onClick={() => {
+                  setCategory(c);
+                  setSubCategory(categoryMap[c][0].name); // reset subcategory
+                }}
                 className={`${chipBase} ${
                   category === c ? activeChip : inactiveChip
                 }`}
@@ -84,7 +114,27 @@ export default function PropertySearchModal({
           </div>
         </div>
 
-        {/* TYPE (Rent / Buy) */}
+        {/* ✅ SUBCATEGORY (DYNAMIC) */}
+        <div className="mb-6">
+          <p className="font-semibold mb-3 text-gray-800">
+            Property Type
+          </p>
+          <div className="flex flex-wrap gap-3">
+            {categoryMap[category].map((sub) => (
+              <button
+                key={sub.name}
+                onClick={() => setSubCategory(sub.name)}
+                className={`${chipBase} ${
+                  subCategory === sub.name ? activeChip : inactiveChip
+                }`}
+              >
+                {sub.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* TYPE */}
         <div className="mb-6">
           <p className="font-semibold mb-3 text-gray-800">
             Looking For
@@ -160,6 +210,7 @@ export default function PropertySearchModal({
             onClick={() =>
               onSearch({
                 category,
+                subCategory,
                 type,
                 city,
                 area,
