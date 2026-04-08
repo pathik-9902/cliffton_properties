@@ -6,6 +6,9 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import PropertySearchModal from '@/components/property/PropertySearchModal';
 
+type CategoryType = 'residential' | 'commercial' | 'land';
+type DealType = 'rent' | 'sale';
+
 const CAROUSEL_SLIDES = [
   {
     image: '/home/bg_img1.jpeg',
@@ -61,40 +64,47 @@ export default function HeroSection(): React.ReactNode {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => 
-        (prevIndex + 1) % CAROUSEL_SLIDES.length
+      setCurrentImageIndex(
+        (prevIndex) => (prevIndex + 1) % CAROUSEL_SLIDES.length
       );
     }, 5000);
 
     return () => clearInterval(interval);
   }, []);
 
+  // ✅ FULLY FIXED HANDLER
   const handleSearch = (data: {
-    type: string;
-    category: string;
-    city: string;
+    category: CategoryType;
+    subCategory: string;
+    type: DealType;
+    city?: string;
     area?: string;
   }) => {
-    const { category, city, area } = data;
+    const params = new URLSearchParams();
 
-    let url = `/properties/${category}?city=${city}`;
+    // REQUIRED PARAMS
+    params.set('category', data.category);
+    params.set('type', data.type);
+    params.set('subtype', data.subCategory);
 
-    if (area) {
-      url += `&area=${area}`;
-    }
+    // OPTIONAL PARAMS (SAFE)
+    if (data.city) params.set('city', data.city);
+    if (data.area) params.set('area', data.area);
+
+    const url = `/properties/${data.category}?${params.toString()}`;
 
     router.push(url);
   };
 
   return (
     <section className="relative overflow-hidden min-h-[600px] sm:min-h-[700px] flex items-center">
-      {/* Background Images Carousel */}
+
+      {/* Background Carousel */}
       {CAROUSEL_SLIDES.map((slide, index) => (
         <div
           key={slide.image}
-          className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-            index === currentImageIndex ? 'opacity-100' : 'opacity-0'
-          }`}
+          className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentImageIndex ? 'opacity-100' : 'opacity-0'
+            }`}
           style={{
             backgroundImage: `url('${slide.image}')`,
             backgroundSize: 'cover',
@@ -103,18 +113,21 @@ export default function HeroSection(): React.ReactNode {
         />
       ))}
 
-      {/* Overlays for better text readability and styling */}
+      {/* Overlay */}
       <div className="absolute inset-0 bg-black/40 sm:bg-transparent sm:bg-gradient-to-r sm:from-black/80 sm:to-black/20" />
       <div className="absolute inset-0 bg-gradient-to-br from-[#6f4e37]/40 via-[#8b6f4e]/30 to-transparent mix-blend-multiply" />
 
+      {/* Content */}
       <div className="relative mx-auto w-full max-w-7xl px-6 py-28 text-white z-10 flex flex-col justify-center">
+
         <div className="relative min-h-[180px] sm:min-h-[220px] md:min-h-[240px] w-full flex items-center">
           {CAROUSEL_SLIDES.map((slide, index) => (
-            <div 
+            <div
               key={`text-${index}`}
-              className={`absolute inset-0 transition-all duration-1000 ease-in-out flex flex-col justify-center ${
-                index === currentImageIndex ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
-              }`}
+              className={`absolute inset-0 transition-all duration-1000 ease-in-out flex flex-col justify-center ${index === currentImageIndex
+                  ? 'opacity-100 translate-y-0'
+                  : 'opacity-0 translate-y-4 pointer-events-none'
+                }`}
             >
               <h1 className="max-w-3xl text-4xl font-extrabold leading-tight sm:text-5xl lg:text-6xl drop-shadow-md whitespace-pre-line">
                 {slide.title}
@@ -127,6 +140,7 @@ export default function HeroSection(): React.ReactNode {
           ))}
         </div>
 
+        {/* Buttons */}
         <div className="mt-15 sm:mt-10 flex flex-wrap gap-4 relative z-20">
           <button
             onClick={() => setOpen(true)}
@@ -145,6 +159,7 @@ export default function HeroSection(): React.ReactNode {
         </div>
       </div>
 
+      {/* MODAL */}
       <PropertySearchModal
         open={open}
         onClose={() => setOpen(false)}

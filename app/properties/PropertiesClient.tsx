@@ -36,12 +36,12 @@ export default function PropertiesClient() {
       setLoading(true);
 
       try {
-        const res = await fetch(`/api/allproperties?${queryString}`, {
+        const res = await fetch(`/api/properties?${queryString}`, {
           signal: controller.signal,
         });
 
         const data = await res.json();
-        setProperties(data.properties || []);
+        setProperties(data.data || []);
       } catch (err) {
         if ((err as any).name !== 'AbortError') {
           console.error(err);
@@ -57,25 +57,34 @@ export default function PropertiesClient() {
   // ---------------- FILTER HANDLER ----------------
   const updateFilter = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
+    const currentCategory = searchParams.get('category');
 
+    if (!params.get('category') && currentCategory) {
+      params.set('category', currentCategory);
+    }
     if (!value || value === 'all') {
       params.delete(key);
     } else {
       params.set(key, value);
     }
 
-    // auto-clean empty params
+    // remove empty values
     for (const [k, v] of params.entries()) {
       if (!v) params.delete(k);
     }
 
     const newQuery = params.toString();
-    router.replace(newQuery ? `/properties?${newQuery}` : '/properties');
+
+    router.replace(
+      newQuery
+        ? `/properties/${currentCategory || ''}?${newQuery}`
+        : `/properties/${currentCategory || ''}`
+    );
   };
 
   // ---------------- LABEL MAP ----------------
   const labelMap: Record<string, string> = {
-    listing: 'Type',
+    type: 'Type', // ✅ fixed
     category: 'Category',
     featured: 'Featured',
     city: 'City',
@@ -96,10 +105,10 @@ export default function PropertiesClient() {
       {/* FILTER CONTROLS */}
       <div className="flex flex-wrap gap-4 mb-6">
 
-        {/* LISTING */}
+        {/* TYPE */}
         <select
-          onChange={(e) => updateFilter('listing', e.target.value)}
-          value={searchParams.get('listing') || ''}
+          onChange={(e) => updateFilter('type', e.target.value)}
+          value={searchParams.get('type') || ''}
           className="border px-3 py-2 rounded"
         >
           <option value="">All</option>
@@ -129,20 +138,20 @@ export default function PropertiesClient() {
           <option value="true">Featured</option>
         </select>
 
-        {/* SORT (NEW) */}
+        {/* SORT (FIXED VALUES) */}
         <select
           onChange={(e) => updateFilter('sort', e.target.value)}
           value={searchParams.get('sort') || ''}
           className="border px-3 py-2 rounded"
         >
           <option value="">Default</option>
-          <option value="latest">Latest</option>
-          <option value="price_low">Price: Low → High</option>
-          <option value="price_high">Price: High → Low</option>
+          <option value="newest">Latest</option>
+          <option value="price_asc">Price: Low → High</option>
+          <option value="price_desc">Price: High → Low</option>
         </select>
       </div>
 
-      {/* ACTIVE FILTERS (AUTO HIDE IF EMPTY) */}
+      {/* ACTIVE FILTERS */}
       {activeFilters.length > 0 && (
         <div className="flex flex-wrap items-center gap-2 mb-6">
           {activeFilters.map(([key, value]) => (

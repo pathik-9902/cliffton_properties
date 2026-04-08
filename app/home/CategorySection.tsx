@@ -28,25 +28,25 @@ export default function CategorySection() {
     description: string;
     category: CategoryType;
   }[] = [
-    {
-      title: 'Residential',
-      icon: <Home strokeWidth={1.4} />,
-      description: 'Apartments, villas, and private residences.',
-      category: 'residential',
-    },
-    {
-      title: 'Commercial',
-      icon: <Building2 strokeWidth={1.4} />,
-      description: 'Offices, retail shops, and workspaces.',
-      category: 'commercial',
-    },
-    {
-      title: 'Land',
-      icon: <LandPlot strokeWidth={1.4} />,
-      description: 'Plots, investments, and development land.',
-      category: 'land',
-    },
-  ];
+      {
+        title: 'Residential',
+        icon: <Home strokeWidth={1.4} />,
+        description: 'Apartments, villas, and private residences.',
+        category: 'residential',
+      },
+      {
+        title: 'Commercial',
+        icon: <Building2 strokeWidth={1.4} />,
+        description: 'Offices, retail shops, and workspaces.',
+        category: 'commercial',
+      },
+      {
+        title: 'Land',
+        icon: <LandPlot strokeWidth={1.4} />,
+        description: 'Plots, investments, and development land.',
+        category: 'land',
+      },
+    ];
 
   const categoryMap: Record<CategoryType, SubCategory[]> = {
     residential: [
@@ -59,6 +59,8 @@ export default function CategorySection() {
       { name: 'office', label: 'Office' },
       { name: 'shop', label: 'Shop' },
       { name: 'workspace', label: 'Workspace' },
+      { name: 'showroom', label: 'Showroom' },
+
     ],
     land: [
       { name: 'agricultural_land', label: 'Agricultural Land' },
@@ -143,22 +145,20 @@ export default function CategorySection() {
             <div className="flex gap-2 mb-6">
               <button
                 onClick={() => setType('sale')}
-                className={`px-4 py-2 rounded-full text-sm ${
-                  type === 'sale'
+                className={`px-4 py-2 rounded-full text-sm ${type === 'sale'
                     ? 'bg-[#6f4e37] text-white'
                     : 'bg-gray-100 text-gray-600'
-                }`}
+                  }`}
               >
                 Buy
               </button>
 
               <button
                 onClick={() => setType('rent')}
-                className={`px-4 py-2 rounded-full text-sm ${
-                  type === 'rent'
+                className={`px-4 py-2 rounded-full text-sm ${type === 'rent'
                     ? 'bg-[#6f4e37] text-white'
                     : 'bg-gray-100 text-gray-600'
-                }`}
+                  }`}
               >
                 Rent
               </button>

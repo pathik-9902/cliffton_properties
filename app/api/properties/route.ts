@@ -62,10 +62,11 @@ function applyFilters(
   properties: Property[],
   searchParams: URLSearchParams
 ) {
+  // ✅ IMPORTANT FIX: get category from query
   const category = searchParams.get('category');
 
-  // ✅ DEFAULT SALE (IMPORTANT)
   const type = searchParams.get('type') || 'sale';
+  const subtype = searchParams.get('subtype');
 
   const minPrice = parseNumber(searchParams.get('minPrice'));
   const maxPrice = parseNumber(searchParams.get('maxPrice'));
@@ -75,16 +76,35 @@ function applyFilters(
 
   const search = searchParams.get('search');
 
-  return properties.filter((p) => {
-    /* ---------- CORE ---------- */
+  const city = searchParams.get('city');
+  const area = searchParams.get('area');
 
+  return properties.filter((p) => {
+    /* ---------- CATEGORY ---------- */
     if (category && p.category !== category) return false;
 
-    // ✅ TYPE FILTER (MANDATORY)
+    /* ---------- TYPE ---------- */
     if (p.listing_type !== type) return false;
 
-    /* ---------- SEARCH ---------- */
+    /* ---------- GLOBAL SUBTYPE (🔥 FIX) ---------- */
+    if (subtype) {
+      if (p.category === 'residential') {
+        if (p.residential_details?.property_subtype !== subtype)
+          return false;
+      }
 
+      if (p.category === 'commercial') {
+        if (p.commercial_details?.commercial_subtype !== subtype)
+          return false;
+      }
+
+      if (p.category === 'land') {
+        if (p.land_details?.land_subtype !== subtype)
+          return false;
+      }
+    }
+
+    /* ---------- SEARCH ---------- */
     if (search) {
       const s = search.toLowerCase();
 
@@ -97,28 +117,21 @@ function applyFilters(
     }
 
     /* ---------- PRICE ---------- */
-
     if (minPrice !== undefined && p.price < minPrice) return false;
     if (maxPrice !== undefined && p.price > maxPrice) return false;
 
     /* ---------- FLAGS ---------- */
-
     if (verified !== undefined && p.verified !== verified) return false;
     if (featured !== undefined && p.is_featured !== featured) return false;
 
     /* ---------- LOCATION ---------- */
-
-    if (searchParams.get('city') && p.city !== searchParams.get('city'))
-      return false;
-
-    if (searchParams.get('area') && p.area !== searchParams.get('area'))
-      return false;
+    if (city && p.city !== city) return false;
+    if (area && p.area !== area) return false;
 
     /* =======================================================
        CATEGORY-SPECIFIC FILTERS
     ======================================================= */
 
-    /* ---------- RESIDENTIAL ---------- */
     if (p.category === 'residential') {
       const r = p.residential_details;
       if (!r) return false;
@@ -137,14 +150,8 @@ function applyFilters(
         if (r.furnishing_type !== searchParams.get('furnishing'))
           return false;
       }
-
-      if (searchParams.get('subtype')) {
-        if (r.property_subtype !== searchParams.get('subtype'))
-          return false;
-      }
     }
 
-    /* ---------- COMMERCIAL ---------- */
     if (p.category === 'commercial') {
       const c = p.commercial_details;
       if (!c) return false;
@@ -160,14 +167,8 @@ function applyFilters(
         )
           return false;
       }
-
-      if (searchParams.get('subtype')) {
-        if (c.commercial_subtype !== searchParams.get('subtype'))
-          return false;
-      }
     }
 
-    /* ---------- LAND ---------- */
     if (p.category === 'land') {
       const l = p.land_details;
       if (!l) return false;
@@ -181,11 +182,6 @@ function applyFilters(
 
       if (searchParams.get('land_zoning')) {
         if (l.land_zoning !== searchParams.get('land_zoning'))
-          return false;
-      }
-
-      if (searchParams.get('subtype')) {
-        if (l.land_subtype !== searchParams.get('subtype'))
           return false;
       }
     }
@@ -240,7 +236,6 @@ export async function GET(request: Request) {
 
   const allProperties = buildProperties();
 
-  /* ---------- SINGLE PROPERTY ---------- */
   const id = searchParams.get('id');
 
   if (id) {
@@ -251,19 +246,14 @@ export async function GET(request: Request) {
     });
   }
 
-  /* ---------- FILTER ---------- */
   const filtered = applyFilters(allProperties, searchParams);
-
-  /* ---------- SORT ---------- */
   const sorted = applySorting(filtered, searchParams.get('sort'));
 
-  /* ---------- PAGINATION ---------- */
   const page = parseNumber(searchParams.get('page')) || 1;
   const limit = parseNumber(searchParams.get('limit')) || 9;
 
   const paginated = applyPagination(sorted, page, limit);
 
-  /* ---------- RESPONSE ---------- */
   return NextResponse.json({
     data: paginated,
     meta: {

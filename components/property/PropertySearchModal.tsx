@@ -19,8 +19,8 @@ type Props = {
     category: CategoryType;
     subCategory: string;
     type: DealType;
-    city: string;
-    area: string;
+    city?: string;
+    area?: string;
   }) => void;
 };
 
@@ -40,7 +40,7 @@ export default function PropertySearchModal({
   const areas = SEARCH_SUGGESTIONS.filter((s) => s.type === 'area');
   const cities = SEARCH_SUGGESTIONS.filter((s) => s.type === 'city');
 
-  // ✅ CATEGORY MAP
+  // CATEGORY MAP
   const categoryMap: Record<CategoryType, SubCategory[]> = {
     residential: [
       { name: 'villa', label: 'Villa' },
@@ -52,6 +52,8 @@ export default function PropertySearchModal({
       { name: 'office', label: 'Office' },
       { name: 'shop', label: 'Shop' },
       { name: 'workspace', label: 'Workspace' },
+      { name: 'showroom', label: 'Showroom' },
+
     ],
     land: [
       { name: 'agricultural_land', label: 'Agricultural Land' },
@@ -102,11 +104,10 @@ export default function PropertySearchModal({
                 key={c}
                 onClick={() => {
                   setCategory(c);
-                  setSubCategory(categoryMap[c][0].name); // reset subcategory
+                  setSubCategory(categoryMap[c][0].name);
                 }}
-                className={`${chipBase} ${
-                  category === c ? activeChip : inactiveChip
-                }`}
+                className={`${chipBase} ${category === c ? activeChip : inactiveChip
+                  }`}
               >
                 {c.charAt(0).toUpperCase() + c.slice(1)}
               </button>
@@ -114,7 +115,7 @@ export default function PropertySearchModal({
           </div>
         </div>
 
-        {/* ✅ SUBCATEGORY (DYNAMIC) */}
+        {/* SUBCATEGORY */}
         <div className="mb-6">
           <p className="font-semibold mb-3 text-gray-800">
             Property Type
@@ -124,9 +125,8 @@ export default function PropertySearchModal({
               <button
                 key={sub.name}
                 onClick={() => setSubCategory(sub.name)}
-                className={`${chipBase} ${
-                  subCategory === sub.name ? activeChip : inactiveChip
-                }`}
+                className={`${chipBase} ${subCategory === sub.name ? activeChip : inactiveChip
+                  }`}
               >
                 {sub.label}
               </button>
@@ -144,9 +144,8 @@ export default function PropertySearchModal({
               <button
                 key={t}
                 onClick={() => setType(t)}
-                className={`${chipBase} ${
-                  type === t ? activeChip : inactiveChip
-                }`}
+                className={`${chipBase} ${type === t ? activeChip : inactiveChip
+                  }`}
               >
                 {t === 'rent' ? 'Rent' : 'Buy'}
               </button>
@@ -154,7 +153,7 @@ export default function PropertySearchModal({
           </div>
         </div>
 
-        {/* City */}
+        {/* CITY */}
         <div className="mb-6">
           <p className="font-semibold mb-3 text-gray-800">City</p>
           <div className="flex flex-wrap gap-3">
@@ -165,9 +164,8 @@ export default function PropertySearchModal({
                   setCity(c.label);
                   setArea('');
                 }}
-                className={`${chipBase} ${
-                  city === c.label ? activeChip : inactiveChip
-                }`}
+                className={`${chipBase} ${city === c.label ? activeChip : inactiveChip
+                  }`}
               >
                 {c.label}
               </button>
@@ -175,7 +173,7 @@ export default function PropertySearchModal({
           </div>
         </div>
 
-        {/* Area */}
+        {/* AREA */}
         <div className="mb-6 sm:mb-8">
           <p className="font-semibold mb-3 text-gray-800">
             Area (Optional)
@@ -187,9 +185,8 @@ export default function PropertySearchModal({
                 <button
                   key={a.label}
                   onClick={() => setArea(a.label)}
-                  className={`${chipBase} ${
-                    area === a.label ? activeChip : inactiveChip
-                  }`}
+                  className={`${chipBase} ${area === a.label ? activeChip : inactiveChip
+                    }`}
                 >
                   {a.label}
                 </button>
@@ -207,15 +204,18 @@ export default function PropertySearchModal({
           </button>
 
           <button
-            onClick={() =>
-              onSearch({
+            onClick={() => {
+              const payload: any = {
                 category,
                 subCategory,
                 type,
-                city,
-                area,
-              })
-            }
+              };
+
+              if (city) payload.city = city;
+              if (area) payload.area = area;
+
+              onSearch(payload);
+            }}
             className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#6f4e37] to-[#c6a15b] text-white font-semibold shadow-lg hover:scale-[1.03] transition-all"
           >
             Search Properties →
