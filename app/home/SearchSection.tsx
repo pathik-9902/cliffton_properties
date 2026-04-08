@@ -30,10 +30,10 @@ export default function SearchSection() {
   useEffect(() => {
     const fetchFeatured = async () => {
       try {
-        const res = await fetch('/api/allproperties?featured=true');
+        const res = await fetch('/api/properties?featured=true');
         const data = await res.json();
 
-        const filtered = (data.properties || []).filter(
+        const filtered = (data.data || []).filter(
           (p: Property) =>
             p &&
             p.id &&
@@ -167,7 +167,7 @@ export default function SearchSection() {
       {/* ---------------- MODAL ---------------- */}
       {showModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center">
-          
+
           {/* BACKDROP */}
           <div
             className="absolute inset-0 bg-black/40"

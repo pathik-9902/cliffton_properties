@@ -89,7 +89,6 @@ export default function ContactPage() {
               <form onSubmit={handleSubmit} className="space-y-6">
 
                 <Field label="Full Name" name="name" required />
-                <Field label="Email Address" name="email" type="email" required />
 
                 {/* MESSAGE */}
                 <div className="space-y-2">

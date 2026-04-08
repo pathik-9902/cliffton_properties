@@ -23,6 +23,8 @@ const parseBoolean = (value: string | null) => {
   return value === 'true';
 };
 
+const normalize = (val?: string | null) => val?.toLowerCase();
+
 /* ---------------- BUILD JOINED DATA ---------------- */
 
 function buildProperties() {
@@ -62,10 +64,10 @@ function applyFilters(
   properties: Property[],
   searchParams: URLSearchParams
 ) {
-  // ✅ IMPORTANT FIX: get category from query
   const category = searchParams.get('category');
+  const type =
+    searchParams.get('listing') || searchParams.get('type'); // ✅ NO DEFAULT
 
-  const type = searchParams.get('type') || 'sale';
   const subtype = searchParams.get('subtype');
 
   const minPrice = parseNumber(searchParams.get('minPrice'));
@@ -79,41 +81,40 @@ function applyFilters(
   const city = searchParams.get('city');
   const area = searchParams.get('area');
 
+  const bedrooms = searchParams.get('bedrooms');
+
   return properties.filter((p) => {
     /* ---------- CATEGORY ---------- */
-    if (category && p.category !== category) return false;
+    if (category && normalize(p.category) !== normalize(category)) {
+      return false;
+    }
 
     /* ---------- TYPE ---------- */
-    if (p.listing_type !== type) return false;
+    if (type && normalize(p.listing_type) !== normalize(type)) {
+      return false;
+    }
 
-    /* ---------- GLOBAL SUBTYPE (🔥 FIX) ---------- */
+    /* ---------- SUBTYPE ---------- */
     if (subtype) {
-      if (p.category === 'residential') {
-        if (p.residential_details?.property_subtype !== subtype)
-          return false;
-      }
+      const match =
+        p.residential_details?.property_subtype === subtype ||
+        p.commercial_details?.commercial_subtype === subtype ||
+        p.land_details?.land_subtype === subtype;
 
-      if (p.category === 'commercial') {
-        if (p.commercial_details?.commercial_subtype !== subtype)
-          return false;
-      }
-
-      if (p.category === 'land') {
-        if (p.land_details?.land_subtype !== subtype)
-          return false;
-      }
+      if (!match) return false;
     }
 
     /* ---------- SEARCH ---------- */
     if (search) {
       const s = search.toLowerCase();
 
-      if (
-        !p.title.toLowerCase().includes(s) &&
-        !p.description.toLowerCase().includes(s)
-      ) {
-        return false;
-      }
+      const match =
+        p.title.toLowerCase().includes(s) ||
+        p.description.toLowerCase().includes(s) ||
+        p.city.toLowerCase().includes(s) ||
+        p.area?.toLowerCase().includes(s);
+
+      if (!match) return false;
     }
 
     /* ---------- PRICE ---------- */
@@ -122,11 +123,22 @@ function applyFilters(
 
     /* ---------- FLAGS ---------- */
     if (verified !== undefined && p.verified !== verified) return false;
-    if (featured !== undefined && p.is_featured !== featured) return false;
+    if (featured !== undefined && p.is_featured !== featured)
+      return false;
 
     /* ---------- LOCATION ---------- */
-    if (city && p.city !== city) return false;
-    if (area && p.area !== area) return false;
+    if (city && normalize(p.city) !== normalize(city)) return false;
+    if (area && normalize(p.area) !== normalize(area)) return false;
+
+    /* ---------- BEDROOMS ---------- */
+    if (bedrooms) {
+      if (
+        !p.residential_details ||
+        String(p.residential_details.bedrooms) !== bedrooms
+      ) {
+        return false;
+      }
+    }
 
     /* =======================================================
        CATEGORY-SPECIFIC FILTERS
@@ -135,11 +147,6 @@ function applyFilters(
     if (p.category === 'residential') {
       const r = p.residential_details;
       if (!r) return false;
-
-      if (searchParams.get('bedrooms')) {
-        if (r.bedrooms < Number(searchParams.get('bedrooms')))
-          return false;
-      }
 
       if (searchParams.get('bathrooms')) {
         if (r.bathrooms < Number(searchParams.get('bathrooms')))
@@ -164,8 +171,9 @@ function applyFilters(
         if (
           c.central_air_conditioning !==
           (searchParams.get('ac') === 'true')
-        )
+        ) {
           return false;
+        }
       }
     }
 
@@ -176,8 +184,9 @@ function applyFilters(
       if (searchParams.get('corner_plot')) {
         if (
           l.corner_plot !== (searchParams.get('corner_plot') === 'true')
-        )
+        ) {
           return false;
+        }
       }
 
       if (searchParams.get('land_zoning')) {
@@ -232,35 +241,46 @@ function applyPagination(
 /* ---------------- HANDLER ---------------- */
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
+  try {
+    const { searchParams } = new URL(request.url);
 
-  const allProperties = buildProperties();
+    const allProperties = buildProperties();
 
-  const id = searchParams.get('id');
+    /* ---------- SINGLE PROPERTY ---------- */
+    const id = searchParams.get('id');
 
-  if (id) {
-    const property = allProperties.find((p) => p.id === id);
+    if (id) {
+      const property = allProperties.find((p) => p.id === id);
+
+      return NextResponse.json({
+        data: property ?? null,
+      });
+    }
+
+    /* ---------- LIST FLOW ---------- */
+    const filtered = applyFilters(allProperties, searchParams);
+    const sorted = applySorting(filtered, searchParams.get('sort'));
+
+    const page = parseNumber(searchParams.get('page')) || 1;
+    const limit = parseNumber(searchParams.get('limit')) || 9;
+
+    const paginated = applyPagination(sorted, page, limit);
 
     return NextResponse.json({
-      data: property ?? null,
+      data: paginated,
+      meta: {
+        total: filtered.length,
+        page,
+        limit,
+        totalPages: Math.ceil(filtered.length / limit),
+      },
     });
+  } catch (error) {
+    console.error('API ERROR:', error);
+
+    return NextResponse.json(
+      { error: 'Failed to fetch properties' },
+      { status: 500 }
+    );
   }
-
-  const filtered = applyFilters(allProperties, searchParams);
-  const sorted = applySorting(filtered, searchParams.get('sort'));
-
-  const page = parseNumber(searchParams.get('page')) || 1;
-  const limit = parseNumber(searchParams.get('limit')) || 9;
-
-  const paginated = applyPagination(sorted, page, limit);
-
-  return NextResponse.json({
-    data: paginated,
-    meta: {
-      total: filtered.length,
-      page,
-      limit,
-      totalPages: Math.ceil(filtered.length / limit),
-    },
-  });
 }
