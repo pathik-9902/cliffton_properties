@@ -3,8 +3,6 @@
 │   ├── about
 │   │   └── page.tsx
 │   ├── api
-│   │   ├── allproperties
-│   │   │   └── route.ts
 │   │   ├── contact
 │   │   │   └── route.ts
 │   │   └── properties
@@ -17,8 +15,6 @@
 │   │   ├── FeaturedSection.tsx
 │   │   ├── HeroSection.tsx
 │   │   ├── ListCTASection.tsx
-│   │   ├── LocalitySection.tsx
-│   │   ├── PropertyTypeSection.tsx
 │   │   ├── SearchSection.tsx
 │   │   └── TrustSection.tsx
 │   ├── layout.tsx
@@ -27,11 +23,9 @@
 │   │   ├── [category]
 │   │   │   ├── ListingClient.tsx
 │   │   │   └── page.tsx
-│   │   ├── detail
-│   │   │   └── [id]
-│   │   │       └── page.tsx
-│   │   ├── page.tsx
-│   │   └── PropertiesClient.tsx
+│   │   └── detail
+│   │       └── [id]
+│   │           └── page.tsx
 │   └── want-to-list
 │       └── page.tsx
 ├── components
@@ -42,8 +36,8 @@
 │   └── property
 │       ├── FeaturedListingCarousel.tsx
 │       ├── Filters.tsx
-│       ├── ProopertySearchModal.tsx
-│       └── PropertyCard.tsx
+│       ├── PropertyCard.tsx
+│       └── PropertySearchModal.tsx
 ├── data
 │   ├── commercial_details.json
 │   ├── data.json
@@ -66,11 +60,14 @@
 ├── postcss.config.mjs
 ├── public
 │   ├── categories
+│   │   ├── agricultural_land.jpeg
 │   │   ├── apartment.jpeg
 │   │   ├── bungalow.jpeg
 │   │   ├── factory.jpeg
 │   │   ├── farmhouse.jpeg
+│   │   ├── industrial_plot.jpeg
 │   │   ├── office.jpeg
+│   │   ├── residential_plot.jpeg
 │   │   ├── shade.jpeg
 │   │   ├── shop.jpeg
 │   │   ├── villa.jpeg
@@ -101,4 +98,4 @@
 └── types
     └── property.ts
 
-25 directories, 77 files
+24 directories, 75 files

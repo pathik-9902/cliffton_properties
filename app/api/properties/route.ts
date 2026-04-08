@@ -66,7 +66,7 @@ function applyFilters(
 ) {
   const category = searchParams.get('category');
   const type =
-    searchParams.get('listing') || searchParams.get('type'); // ✅ NO DEFAULT
+    searchParams.get('listing') || searchParams.get('type');
 
   const subtype = searchParams.get('subtype');
 
@@ -84,17 +84,14 @@ function applyFilters(
   const bedrooms = searchParams.get('bedrooms');
 
   return properties.filter((p) => {
-    /* ---------- CATEGORY ---------- */
     if (category && normalize(p.category) !== normalize(category)) {
       return false;
     }
 
-    /* ---------- TYPE ---------- */
     if (type && normalize(p.listing_type) !== normalize(type)) {
       return false;
     }
 
-    /* ---------- SUBTYPE ---------- */
     if (subtype) {
       const match =
         p.residential_details?.property_subtype === subtype ||
@@ -104,7 +101,6 @@ function applyFilters(
       if (!match) return false;
     }
 
-    /* ---------- SEARCH ---------- */
     if (search) {
       const s = search.toLowerCase();
 
@@ -117,20 +113,16 @@ function applyFilters(
       if (!match) return false;
     }
 
-    /* ---------- PRICE ---------- */
     if (minPrice !== undefined && p.price < minPrice) return false;
     if (maxPrice !== undefined && p.price > maxPrice) return false;
 
-    /* ---------- FLAGS ---------- */
     if (verified !== undefined && p.verified !== verified) return false;
     if (featured !== undefined && p.is_featured !== featured)
       return false;
 
-    /* ---------- LOCATION ---------- */
     if (city && normalize(p.city) !== normalize(city)) return false;
     if (area && normalize(p.area) !== normalize(area)) return false;
 
-    /* ---------- BEDROOMS ---------- */
     if (bedrooms) {
       if (
         !p.residential_details ||
@@ -140,9 +132,7 @@ function applyFilters(
       }
     }
 
-    /* =======================================================
-       CATEGORY-SPECIFIC FILTERS
-    ======================================================= */
+    /* CATEGORY-SPECIFIC */
 
     if (p.category === 'residential') {
       const r = p.residential_details;
@@ -246,18 +236,8 @@ export async function GET(request: Request) {
 
     const allProperties = buildProperties();
 
-    /* ---------- SINGLE PROPERTY ---------- */
-    const id = searchParams.get('id');
+    /* ---------- LIST FLOW ONLY ---------- */
 
-    if (id) {
-      const property = allProperties.find((p) => p.id === id);
-
-      return NextResponse.json({
-        data: property ?? null,
-      });
-    }
-
-    /* ---------- LIST FLOW ---------- */
     const filtered = applyFilters(allProperties, searchParams);
     const sorted = applySorting(filtered, searchParams.get('sort'));
 
