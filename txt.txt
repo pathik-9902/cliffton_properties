@@ -6,5 +6,4 @@ rm -rf .next
 clear
 npm run dev
 
-
 VickyPatel@0821
