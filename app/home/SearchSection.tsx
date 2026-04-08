@@ -2,8 +2,8 @@
 
 import { Search } from 'lucide-react';
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { parseSearch } from '@/lib/config/parseSearch';
-import { SEARCH_SUGGESTIONS } from '@/lib/config/searchData';
+import { parseSearch } from '@/lib/config/search/parseSearch';
+import { SEARCH_SUGGESTIONS } from '@/lib/config/search/searchData';
 import FeaturedListingCarousel from '@/components/property/FeaturedListingCarousel';
 
 // ---------------- TYPES ----------------
@@ -128,7 +128,7 @@ export default function SearchSection() {
                   }}
                   onFocus={() => setShowDropdown(true)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Search city, area, or '2 BHK in Vesu'"
+                  placeholder="Search city, area, or BHK (e.g. '2 BHK in Vesu')"
                   className="w-full text-sm outline-none"
                 />
 

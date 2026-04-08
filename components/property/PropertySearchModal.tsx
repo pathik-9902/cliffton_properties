@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { SEARCH_SUGGESTIONS } from '@/lib/config/searchData';
+import { SEARCH_SUGGESTIONS } from '@/lib/config/search/searchData';
 import { X } from 'lucide-react';
 
 type CategoryType = 'residential' | 'commercial' | 'land';

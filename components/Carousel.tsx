@@ -42,6 +42,7 @@ export default function ImageCarousel({ images, title }: Props) {
                 src={img.image_url}
                 alt={`${title} ${idx + 1}`}
                 fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 60vw"
                 className="object-cover"
                 priority={idx === 0}
               />

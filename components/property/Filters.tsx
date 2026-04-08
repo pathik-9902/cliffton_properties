@@ -10,8 +10,8 @@ import {
   useCallback,
 } from 'react';
 
-import { getFiltersConfig } from '@/lib/config/getFiltersConfig';
-import { FilterConfig } from '@/lib/config/filters';
+import { getFiltersConfig } from '@/lib/config/filter/getFiltersConfig';
+import { FilterConfig } from '@/lib/config/filter/filters';
 
 /* ---------------- TYPES ---------------- */
 
@@ -44,9 +44,30 @@ export default function Filters({
   const isFirstRender = useRef(true);
   const prevQueryRef = useRef('');
 
+  /* ---------------- CONFIG ---------------- */
+
   const config: FilterConfig[] = useMemo(() => {
-    return getFiltersConfig(category);
+    const raw = getFiltersConfig(category);
+
+    return raw.sort(
+      (a, b) => (a.priority || 999) - (b.priority || 999)
+    );
   }, [category]);
+
+  /* ---------------- GROUPING ---------------- */
+
+  const groupedFilters = useMemo(() => {
+    const groups: Record<string, FilterConfig[]> = {};
+
+    config.forEach((filter) => {
+      const group = filter.group || 'other';
+
+      if (!groups[group]) groups[group] = [];
+      groups[group].push(filter);
+    });
+
+    return groups;
+  }, [config]);
 
   /* ---------------- SYNC ---------------- */
 
@@ -58,7 +79,7 @@ export default function Filters({
       obj[key] = value;
     });
 
-    if (!obj.type) obj.type = 'sale'; // ✅ default
+    if (!obj.type) obj.type = 'sale';
 
     setFilters(obj);
     setMinPrice(obj.minPrice || '');
@@ -135,127 +156,177 @@ export default function Filters({
     Object.keys(filters).filter((k) => filters[k]).length +
     (minPrice || maxPrice ? 1 : 0);
 
+  /* ---------------- RENDER FIELD ---------------- */
+
+  const renderField = (filter: FilterConfig) => {
+    if (filter.type === 'price') {
+      return (
+        <div key="price" className="space-y-3">
+          <label className="text-sm font-medium">
+            {filter.label}
+          </label>
+
+          <div className="flex gap-3">
+            <input
+              type="number"
+              placeholder="Min ₹"
+              value={minPrice}
+              onChange={(e) => setMinPrice(e.target.value)}
+              className="w-full bg-[#F4EFE9] rounded-xl p-3 text-sm focus:ring-2 focus:ring-black/20 outline-none"
+            />
+
+            <input
+              type="number"
+              placeholder="Max ₹"
+              value={maxPrice}
+              onChange={(e) => setMaxPrice(e.target.value)}
+              className="w-full bg-[#F4EFE9] rounded-xl p-3 text-sm focus:ring-2 focus:ring-black/20 outline-none"
+            />
+          </div>
+        </div>
+      );
+    }
+
+    if (!filter.options) return null;
+
+    /* ---------------- CHIPS ---------------- */
+    if (filter.type === 'chips') {
+      return (
+        <div key={filter.key} className="space-y-3">
+          <label className="text-sm font-medium">
+            {filter.label}
+          </label>
+
+          <div className="flex flex-wrap gap-2">
+            {filter.options.map((opt) => {
+              const active =
+                (filters[filter.key] || '') === opt.value;
+
+              return (
+                <button
+                  key={opt.value}
+                  onClick={() =>
+                    updateField(filter.key, opt.value)
+                  }
+                  className={`
+                    px-3 py-1.5 rounded-full text-xs transition-all
+                    ${active
+                      ? 'bg-black text-white shadow'
+                      : 'bg-[#F4EFE9] hover:bg-[#EDE6DC] text-[#444]'}
+                  `}
+                >
+                  {opt.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
+    /* ---------------- SELECT ---------------- */
+    return (
+      <div key={filter.key} className="space-y-3">
+        <label className="text-sm font-medium">
+          {filter.label}
+        </label>
+
+        <select
+          value={filters[filter.key] || ''}
+          onChange={(e) =>
+            updateField(filter.key, e.target.value)
+          }
+          className="w-full bg-[#F4EFE9] rounded-xl p-3 text-sm focus:ring-2 focus:ring-black/20 outline-none"
+        >
+          <option value="">All</option>
+
+          {filter.options.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+      </div>
+    );
+  };
+
   /* ---------------- UI ---------------- */
 
   return (
-    <div className="backdrop-blur-xl bg-white/80 border border-[#E8E2DA] shadow-xl rounded-[28px] p-6 space-y-8">
+    <div className="sticky top-6">
 
-      {/* HEADER */}
-      <div className="flex justify-between items-start">
-        <div>
-          <h2 className="text-lg font-semibold tracking-tight">
-            Filters
-          </h2>
+      <div className="bg-white/70 backdrop-blur-2xl border border-white/40 shadow-[0_10px_40px_rgba(0,0,0,0.08)] rounded-[32px] p-6 space-y-10">
+
+        {/* HEADER */}
+        <div className="flex justify-between items-center">
+          <div>
+            <h2 className="text-lg font-semibold tracking-tight">
+              Filters
+            </h2>
+            {activeCount > 0 && (
+              <p className="text-xs text-[#6B6B6B] mt-1">
+                {activeCount} active filters
+              </p>
+            )}
+          </div>
+
           {activeCount > 0 && (
-            <p className="text-xs text-[#6B6B6B] mt-1">
-              {activeCount} active
-            </p>
+            <button
+              onClick={clearFilters}
+              className="text-xs px-3 py-1.5 rounded-full bg-[#F4EFE9] hover:bg-[#EDE6DC]"
+            >
+              Reset
+            </button>
           )}
         </div>
 
-        {activeCount > 0 && (
-          <button
-            onClick={clearFilters}
-            className="text-xs text-[#C9A24D] hover:underline"
-          >
-            Reset
-          </button>
+        {/* LISTING TYPE */}
+        <div className="space-y-3">
+          <label className="text-sm font-medium">Listing Type</label>
+
+          <div className="flex gap-2">
+            {['sale', 'rent'].map((t) => {
+              const active = (filters.type || 'sale') === t;
+
+              return (
+                <button
+                  key={t}
+                  onClick={() => updateField('type', t)}
+                  className={`
+                    flex-1 py-2 rounded-full text-sm font-medium transition-all
+                    ${active
+                      ? 'bg-black text-white shadow-md scale-[1.02]'
+                      : 'bg-[#F4EFE9] text-[#6B6B6B] hover:bg-[#EDE6DC]'}
+                  `}
+                >
+                  {t === 'sale' ? 'Buy' : 'Rent'}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* GROUPED FILTERS */}
+        {Object.entries(groupedFilters).map(
+          ([group, filters]) => (
+            <div key={group} className="space-y-6">
+
+              <div className="text-xs font-semibold uppercase text-[#888] tracking-wide">
+                {group}
+              </div>
+
+              {filters.map((f) => renderField(f))}
+            </div>
+          )
+        )}
+
+        {/* LOADING */}
+        {isPending && (
+          <div className="text-xs text-[#6B6B6B] animate-pulse">
+            Updating results...
+          </div>
         )}
       </div>
-
-      {/* 🔥 PREMIUM SEGMENTED CONTROL */}
-      <div className="space-y-3">
-        <label className="text-sm font-medium">Listing Type</label>
-
-        <div className="relative flex bg-[#F4EFE9] p-1 rounded-2xl">
-          {['sale', 'rent'].map((t) => {
-            const active = (filters.type || 'sale') === t;
-
-            return (
-              <button
-                key={t}
-                onClick={() => updateField('type', t)}
-                className={`
-                  relative z-10 flex-1 py-2 text-sm font-medium rounded-xl transition-all duration-300
-                  ${active
-                    ? 'bg-white shadow text-black'
-                    : 'text-[#6B6B6B]'}
-                `}
-              >
-                {t === 'sale' ? 'Sale' : 'Rent'}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* FILTER GROUPS */}
-      {config.map((filter) => {
-        if (filter.type === 'price') {
-          return (
-            <div key="price" className="space-y-3">
-              <label className="text-sm font-medium">
-                {filter.label}
-              </label>
-
-              <div className="flex gap-3">
-                <input
-                  type="number"
-                  placeholder="Min ₹"
-                  value={minPrice}
-                  onChange={(e) => setMinPrice(e.target.value)}
-                  className="w-full bg-[#F4EFE9] border border-transparent focus:border-[#C9A24D]/40 focus:ring-2 focus:ring-[#C9A24D]/20 rounded-xl p-3 text-sm transition"
-                />
-
-                <input
-                  type="number"
-                  placeholder="Max ₹"
-                  value={maxPrice}
-                  onChange={(e) => setMaxPrice(e.target.value)}
-                  className="w-full bg-[#F4EFE9] border border-transparent focus:border-[#C9A24D]/40 focus:ring-2 focus:ring-[#C9A24D]/20 rounded-xl p-3 text-sm transition"
-                />
-              </div>
-            </div>
-          );
-        }
-
-        return (
-          <div key={filter.key} className="space-y-3">
-            <label className="text-sm font-medium">
-              {filter.label}
-            </label>
-
-            <div className="relative">
-              <select
-                value={filters[filter.key] || ''}
-                onChange={(e) =>
-                  updateField(filter.key, e.target.value)
-                }
-                className="w-full bg-[#F4EFE9] border border-transparent focus:border-[#C9A24D]/40 focus:ring-2 focus:ring-[#C9A24D]/20 rounded-xl p-3 text-sm appearance-none transition"
-              >
-                <option value="">All</option>
-
-                {filter.options.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#6B6B6B]">
-                ▼
-              </span>
-            </div>
-          </div>
-        );
-      })}
-
-      {/* LOADING */}
-      {isPending && (
-        <div className="text-xs text-[#6B6B6B] animate-pulse">
-          Updating results...
-        </div>
-      )}
     </div>
   );
 }

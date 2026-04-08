@@ -1,4 +1,4 @@
-import { FILTERS_CONFIG, FilterConfig } from '@/lib/config/filters';
+import { FILTERS_CONFIG, FilterConfig } from '@/lib/config/filter/filters';
 
 /* ---------------- CACHE ---------------- */
 
