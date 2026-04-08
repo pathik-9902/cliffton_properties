@@ -20,6 +20,42 @@ type Props = {
   initialFilters?: Record<string, string>;
 };
 
+/* ---------------- UI TOKENS ---------------- */
+
+const ui = {
+  container:
+    'bg-white border border-gray-200 rounded-2xl p-6 space-y-8 shadow-sm',
+
+  section: 'space-y-4',
+
+  label: 'text-sm font-medium text-gray-800',
+
+  input:
+    'w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-300 transition',
+
+  chip:
+    'px-3 py-1.5 rounded-full text-xs transition border',
+
+  chipActive:
+    'bg-black text-white border-black shadow-sm',
+
+  chipInactive:
+    'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100',
+
+  buttonBase:
+    'text-sm font-medium rounded-full transition',
+
+  toggleActive:
+    'bg-black text-white shadow-sm',
+
+  toggleInactive:
+    'bg-gray-100 text-gray-600 hover:bg-gray-200',
+
+  divider: 'border-t border-gray-200 pt-6',
+};
+
+/* ---------------- COMPONENT ---------------- */
+
 export default function Filters({
   category,
   initialFilters = {},
@@ -161,10 +197,8 @@ export default function Filters({
   const renderField = (filter: FilterConfig) => {
     if (filter.type === 'price') {
       return (
-        <div key="price" className="space-y-3">
-          <label className="text-sm font-medium">
-            {filter.label}
-          </label>
+        <div key="price" className={ui.section}>
+          <label className={ui.label}>{filter.label}</label>
 
           <div className="flex gap-3">
             <input
@@ -172,7 +206,7 @@ export default function Filters({
               placeholder="Min ₹"
               value={minPrice}
               onChange={(e) => setMinPrice(e.target.value)}
-              className="w-full bg-[#F4EFE9] rounded-xl p-3 text-sm focus:ring-2 focus:ring-black/20 outline-none"
+              className={ui.input}
             />
 
             <input
@@ -180,7 +214,7 @@ export default function Filters({
               placeholder="Max ₹"
               value={maxPrice}
               onChange={(e) => setMaxPrice(e.target.value)}
-              className="w-full bg-[#F4EFE9] rounded-xl p-3 text-sm focus:ring-2 focus:ring-black/20 outline-none"
+              className={ui.input}
             />
           </div>
         </div>
@@ -190,12 +224,11 @@ export default function Filters({
     if (!filter.options) return null;
 
     /* ---------------- CHIPS ---------------- */
+
     if (filter.type === 'chips') {
       return (
-        <div key={filter.key} className="space-y-3">
-          <label className="text-sm font-medium">
-            {filter.label}
-          </label>
+        <div key={filter.key} className={ui.section}>
+          <label className={ui.label}>{filter.label}</label>
 
           <div className="flex flex-wrap gap-2">
             {filter.options.map((opt) => {
@@ -208,12 +241,9 @@ export default function Filters({
                   onClick={() =>
                     updateField(filter.key, opt.value)
                   }
-                  className={`
-                    px-3 py-1.5 rounded-full text-xs transition-all
-                    ${active
-                      ? 'bg-black text-white shadow'
-                      : 'bg-[#F4EFE9] hover:bg-[#EDE6DC] text-[#444]'}
-                  `}
+                  className={`${ui.chip} ${
+                    active ? ui.chipActive : ui.chipInactive
+                  }`}
                 >
                   {opt.label}
                 </button>
@@ -225,18 +255,17 @@ export default function Filters({
     }
 
     /* ---------------- SELECT ---------------- */
+
     return (
-      <div key={filter.key} className="space-y-3">
-        <label className="text-sm font-medium">
-          {filter.label}
-        </label>
+      <div key={filter.key} className={ui.section}>
+        <label className={ui.label}>{filter.label}</label>
 
         <select
           value={filters[filter.key] || ''}
           onChange={(e) =>
             updateField(filter.key, e.target.value)
           }
-          className="w-full bg-[#F4EFE9] rounded-xl p-3 text-sm focus:ring-2 focus:ring-black/20 outline-none"
+          className={ui.input}
         >
           <option value="">All</option>
 
@@ -254,17 +283,14 @@ export default function Filters({
 
   return (
     <div className="sticky top-6">
-
-      <div className="bg-white/70 backdrop-blur-2xl border border-white/40 shadow-[0_10px_40px_rgba(0,0,0,0.08)] rounded-[32px] p-6 space-y-10">
-
+      <div className={ui.container}>
         {/* HEADER */}
         <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-lg font-semibold tracking-tight">
-              Filters
-            </h2>
+            <h2 className="text-lg font-semibold">Filters</h2>
+
             {activeCount > 0 && (
-              <p className="text-xs text-[#6B6B6B] mt-1">
+              <p className="text-xs text-gray-500 mt-1">
                 {activeCount} active filters
               </p>
             )}
@@ -273,7 +299,7 @@ export default function Filters({
           {activeCount > 0 && (
             <button
               onClick={clearFilters}
-              className="text-xs px-3 py-1.5 rounded-full bg-[#F4EFE9] hover:bg-[#EDE6DC]"
+              className="text-xs px-3 py-1.5 rounded-full bg-gray-100 hover:bg-gray-200"
             >
               Reset
             </button>
@@ -281,8 +307,8 @@ export default function Filters({
         </div>
 
         {/* LISTING TYPE */}
-        <div className="space-y-3">
-          <label className="text-sm font-medium">Listing Type</label>
+        <div className={ui.section}>
+          <label className={ui.label}>Listing Type</label>
 
           <div className="flex gap-2">
             {['sale', 'rent'].map((t) => {
@@ -292,12 +318,11 @@ export default function Filters({
                 <button
                   key={t}
                   onClick={() => updateField('type', t)}
-                  className={`
-                    flex-1 py-2 rounded-full text-sm font-medium transition-all
-                    ${active
-                      ? 'bg-black text-white shadow-md scale-[1.02]'
-                      : 'bg-[#F4EFE9] text-[#6B6B6B] hover:bg-[#EDE6DC]'}
-                  `}
+                  className={`flex-1 py-2 ${ui.buttonBase} ${
+                    active
+                      ? ui.toggleActive
+                      : ui.toggleInactive
+                  }`}
                 >
                   {t === 'sale' ? 'Buy' : 'Rent'}
                 </button>
@@ -308,21 +333,25 @@ export default function Filters({
 
         {/* GROUPED FILTERS */}
         {Object.entries(groupedFilters).map(
-          ([group, filters]) => (
-            <div key={group} className="space-y-6">
-
-              <div className="text-xs font-semibold uppercase text-[#888] tracking-wide">
+          ([group, filters], index) => (
+            <div
+              key={group}
+              className={index !== 0 ? ui.divider : ''}
+            >
+              <div className="text-xs font-semibold uppercase text-gray-400 tracking-wide mb-4">
                 {group}
               </div>
 
-              {filters.map((f) => renderField(f))}
+              <div className="space-y-6">
+                {filters.map((f) => renderField(f))}
+              </div>
             </div>
           )
         )}
 
         {/* LOADING */}
         {isPending && (
-          <div className="text-xs text-[#6B6B6B] animate-pulse">
+          <div className="text-xs text-gray-500 animate-pulse">
             Updating results...
           </div>
         )}

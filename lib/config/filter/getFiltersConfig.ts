@@ -1,10 +1,59 @@
 import { FILTERS_CONFIG, FilterConfig } from '@/lib/config/filter/filters';
 
+import {
+  getDynamicCities,
+  getDynamicAreas,
+  getDynamicBHK,
+  getDynamicResidentialTypes,
+  getDynamicCommercialTypes,
+  getDynamicLandTypes,
+} from './dynamicFilter';
+
 /* ---------------- CACHE ---------------- */
 
 const configCache = new Map<string, FilterConfig[]>();
 
-/* ---------------- FUNCTION ---------------- */
+/* ---------------- INJECTOR ---------------- */
+
+function injectDynamicOptions(
+  filters: FilterConfig[],
+  category: string
+): FilterConfig[] {
+  return filters.map((filter) => {
+    switch (filter.key) {
+      /* -------- COMMON -------- */
+      case 'city':
+        return { ...filter, options: getDynamicCities() };
+
+      case 'area':
+        return { ...filter, options: getDynamicAreas() };
+
+      /* -------- RESIDENTIAL -------- */
+      case 'bedrooms':
+        if (category === 'residential') {
+          return { ...filter, options: getDynamicBHK() };
+        }
+        return filter;
+
+      case 'subtype':
+        if (category === 'residential') {
+          return { ...filter, options: getDynamicResidentialTypes() };
+        }
+        if (category === 'commercial') {
+          return { ...filter, options: getDynamicCommercialTypes() };
+        }
+        if (category === 'land') {
+          return { ...filter, options: getDynamicLandTypes() };
+        }
+        return filter;
+
+      default:
+        return filter;
+    }
+  });
+}
+
+/* ---------------- MAIN FUNCTION ---------------- */
 
 export function getFiltersConfig(category: string): FilterConfig[] {
   if (configCache.has(category)) {
@@ -17,7 +66,9 @@ export function getFiltersConfig(category: string): FilterConfig[] {
 
   const merged = [...base, ...categoryConfig];
 
-  configCache.set(category, merged);
+  const finalConfig = injectDynamicOptions(merged, category);
 
-  return merged;
+  configCache.set(category, finalConfig);
+
+  return finalConfig;
 }

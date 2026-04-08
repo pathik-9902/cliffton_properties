@@ -5,7 +5,7 @@ import useEmblaCarousel from 'embla-carousel-react';
 import { useCallback, useEffect, useState } from 'react';
 
 type Props = {
-  images: { image_url: string }[];
+  images: { public_id: string }[];
   title: string;
 };
 
@@ -39,7 +39,7 @@ export default function ImageCarousel({ images, title }: Props) {
           {images.map((img, idx) => (
             <div key={idx} className="relative min-w-full h-[320px] md:h-[520px]">
               <Image
-                src={img.image_url}
+                src={img.public_id}
                 alt={`${title} ${idx + 1}`}
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 60vw"

@@ -63,7 +63,7 @@ export interface LandProperty {
 
 export interface PropertyImage {
   id: string;
-  image_url: string;
+  public_id: string;
   sort_order: number;
 }
 

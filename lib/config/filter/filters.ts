@@ -1,3 +1,4 @@
+// lib/config/filter/filters
 /* ---------------- TYPES ---------------- */
 
 export type FilterOption = {

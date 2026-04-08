@@ -64,7 +64,7 @@ function PropertyCardComponent({
   };
 
   const currentImage =
-    sortedImages[index]?.image_url || '/placeholder.png';
+    sortedImages[index]?.public_id || '/placeholder.png';
 
   /* ---------------- DERIVED ---------------- */
 

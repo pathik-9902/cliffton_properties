@@ -58,7 +58,7 @@ export default function FeaturedListingCarousel({ properties }: Props) {
     if (typeof first === 'string') return first;
 
     if (typeof first === 'object') {
-      if (first.image_url) return first.image_url; // ✅ FIX
+      if (first.public_id) return first.public_id; // ✅ FIX
       if (first.url) return first.url;
       if (first.src) return first.src;
     }
