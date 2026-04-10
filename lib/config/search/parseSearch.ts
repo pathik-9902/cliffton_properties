@@ -1,8 +1,12 @@
 // lib/config/parseSearch.ts
 
-import { SEARCH_SUGGESTIONS } from './searchData';
+type SuggestionItem = {
+  label: string;
+  type: string;
+  city?: string;
+};
 
-export function parseSearch(input: string) {
+export function parseSearch(input: string, suggestions: SuggestionItem[]) {
   const value = input.toLowerCase().trim();
 
   let city: string | null = null;
@@ -16,7 +20,7 @@ export function parseSearch(input: string) {
   }
 
   // ---------------- MATCH AREA / CITY ----------------
-  for (const item of SEARCH_SUGGESTIONS) {
+  for (const item of suggestions) {
     const label = item.label.toLowerCase();
 
     if (value.includes(label)) {

@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { SEARCH_SUGGESTIONS } from '@/lib/config/search/searchData';
-import { X } from 'lucide-react';
+import { useState, useMemo, useEffect } from 'react';
+import { useFilterOptions } from '@/lib/hooks/useFilterOptions';
+import { X, Loader2 } from 'lucide-react';
 
 type CategoryType = 'residential' | 'commercial' | 'land';
 type DealType = 'rent' | 'sale';
@@ -29,182 +29,202 @@ export default function PropertySearchModal({
   onClose,
   onSearch,
 }: Props) {
+  const { options, loading } = useFilterOptions();
+  
   const [category, setCategory] = useState<CategoryType>('residential');
-  const [subCategory, setSubCategory] = useState<string>('villa');
+  const [subCategory, setSubCategory] = useState<string>('');
   const [type, setType] = useState<DealType>('sale');
   const [city, setCity] = useState('');
   const [area, setArea] = useState('');
 
+  const categoryMap: Record<CategoryType, SubCategory[]> = useMemo(() => {
+    if (!options) return { residential: [], commercial: [], land: [] };
+    const toSub = (arr: string[]) => arr.map(s => ({ name: s, label: s }));
+    
+    return {
+      residential: options.residentialTypes.length ? toSub(options.residentialTypes) : toSub(['Villa', 'Apartment']),
+      commercial: options.commercialTypes.length ? toSub(options.commercialTypes) : toSub(['Office', 'Shop']),
+      land: options.landTypes.length ? toSub(options.landTypes) : toSub(['Agricultural', 'Plot'])
+    };
+  }, [options]);
+
+  useEffect(() => {
+    if (categoryMap[category].length > 0 && !subCategory) {
+      setSubCategory(categoryMap[category][0].name);
+    }
+  }, [category, categoryMap, subCategory]);
+
   if (!open) return null;
 
-  const areas = SEARCH_SUGGESTIONS.filter((s) => s.type === 'area');
-  const cities = SEARCH_SUGGESTIONS.filter((s) => s.type === 'city');
+  if (loading || !options) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
+        <Loader2 className="animate-spin text-white w-10 h-10" />
+      </div>
+    );
+  }
 
-  // CATEGORY MAP
-  const categoryMap: Record<CategoryType, SubCategory[]> = {
-    residential: [
-      { name: 'villa', label: 'Villa' },
-      { name: 'bungalow', label: 'Bungalow' },
-      { name: 'farmhouse', label: 'Farmhouse' },
-      { name: 'apartment', label: 'Apartment' },
-    ],
-    commercial: [
-      { name: 'office', label: 'Office' },
-      { name: 'shop', label: 'Shop' },
-      { name: 'workspace', label: 'Workspace' },
-      { name: 'showroom', label: 'Showroom' },
-
-    ],
-    land: [
-      { name: 'agricultural_land', label: 'Agricultural Land' },
-      { name: 'industrial_plot', label: 'Industrial Plot' },
-      { name: 'residential_plot', label: 'Residential Plot' },
-    ],
-  };
+  const areas = options.areas;
+  const cities = options.cities.map(c => ({ label: c }));
 
   const chipBase =
     'px-4 py-2 rounded-full border text-sm font-medium transition-all cursor-pointer';
 
   const activeChip =
-    'bg-[#6f4e37] text-white border-[#6f4e37] shadow-md';
+    'bg-[#1F1F1F] text-white border-[#1F1F1F] shadow-md';
 
   const inactiveChip =
-    'bg-white text-gray-700 border-gray-200 hover:border-[#6f4e37] hover:text-[#6f4e37]';
+    'bg-white text-gray-700 border-[#E8E2DA] hover:border-[#C9A24D] hover:text-[#C9A24D]';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="relative w-full max-w-2xl rounded-3xl bg-white/90 backdrop-blur-xl p-6 sm:p-8 shadow-2xl border border-white/20 animate-fadeIn">
-
-        {/* Close */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-full hover:bg-black/5"
-        >
-          <X className="w-5 h-5" />
-        </button>
-
-        {/* Heading */}
-        <div className="mb-6 sm:mb-8">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
-            Find Your Perfect Property
-          </h2>
-          <p className="text-gray-500 text-sm mt-1">
-            Refine your search in seconds
-          </p>
-        </div>
-
-        {/* CATEGORY */}
-        <div className="mb-6">
-          <p className="font-semibold mb-3 text-gray-800">
-            Property Category
-          </p>
-          <div className="flex flex-wrap gap-3">
-            {(['residential', 'commercial', 'land'] as CategoryType[]).map((c) => (
-              <button
-                key={c}
-                onClick={() => {
-                  setCategory(c);
-                  setSubCategory(categoryMap[c][0].name);
-                }}
-                className={`${chipBase} ${category === c ? activeChip : inactiveChip
-                  }`}
-              >
-                {c.charAt(0).toUpperCase() + c.slice(1)}
-              </button>
-            ))}
+    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm sm:p-4">
+      <div className="relative w-full max-w-xl max-h-[85vh] sm:max-h-[90vh] flex flex-col rounded-t-[2.5rem] sm:rounded-[2.5rem] bg-white shadow-2xl overflow-hidden animate-fadeIn">
+        
+        {/* Header */}
+        <div className="p-6 sm:p-8 border-b border-[#F4EFE9]">
+          <div className="flex justify-between items-start">
+            <div>
+              <h2 className="text-xl sm:text-2xl font-bold text-[#1F1F1F] tracking-tight">
+                Refine Your Search
+              </h2>
+              <p className="text-[#6B6B6B] text-sm mt-1 uppercase tracking-widest font-semibold opacity-60">
+                Seconds to your dream home
+              </p>
+            </div>
+            <button
+              onClick={onClose}
+              className="p-2 rounded-full hover:bg-black/5 transition-colors"
+            >
+              <X size={24} />
+            </button>
           </div>
         </div>
 
-        {/* SUBCATEGORY */}
-        <div className="mb-6">
-          <p className="font-semibold mb-3 text-gray-800">
-            Property Type
-          </p>
-          <div className="flex flex-wrap gap-3">
-            {categoryMap[category].map((sub) => (
-              <button
-                key={sub.name}
-                onClick={() => setSubCategory(sub.name)}
-                className={`${chipBase} ${subCategory === sub.name ? activeChip : inactiveChip
-                  }`}
-              >
-                {sub.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* TYPE */}
-        <div className="mb-6">
-          <p className="font-semibold mb-3 text-gray-800">
-            Looking For
-          </p>
-          <div className="flex gap-3">
-            {(['rent', 'sale'] as DealType[]).map((t) => (
-              <button
-                key={t}
-                onClick={() => setType(t)}
-                className={`${chipBase} ${type === t ? activeChip : inactiveChip
-                  }`}
-              >
-                {t === 'rent' ? 'Rent' : 'Buy'}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* CITY */}
-        <div className="mb-6">
-          <p className="font-semibold mb-3 text-gray-800">City</p>
-          <div className="flex flex-wrap gap-3">
-            {cities.map((c) => (
-              <button
-                key={c.label}
-                onClick={() => {
-                  setCity(c.label);
-                  setArea('');
-                }}
-                className={`${chipBase} ${city === c.label ? activeChip : inactiveChip
-                  }`}
-              >
-                {c.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* AREA */}
-        <div className="mb-6 sm:mb-8">
-          <p className="font-semibold mb-3 text-gray-800">
-            Area (Optional)
-          </p>
-          <div className="flex flex-wrap gap-3 max-h-32 overflow-y-auto pr-1">
-            {areas
-              .filter((a) => !city || a.city === city)
-              .map((a) => (
+        {/* Scrollable Body */}
+        <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-8 scrollbar-hide">
+          
+          {/* CATEGORY */}
+          <section>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#C9A24D] mb-4">
+              Property Category
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {(['residential', 'commercial', 'land'] as CategoryType[]).map((c) => (
                 <button
-                  key={a.label}
-                  onClick={() => setArea(a.label)}
-                  className={`${chipBase} ${area === a.label ? activeChip : inactiveChip
-                    }`}
+                  key={c}
+                  onClick={() => {
+                    setCategory(c);
+                    setSubCategory(categoryMap[c][0].name);
+                  }}
+                  className={`${chipBase} py-1.5 px-4 rounded-xl ${
+                    category === c ? activeChip : inactiveChip
+                  }`}
                 >
-                  {a.label}
+                  {c}
                 </button>
               ))}
+            </div>
+          </section>
+
+          {/* SUBCATEGORY */}
+          <section>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#C9A24D] mb-4">
+              Property Type
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {categoryMap[category].map((sub) => (
+                <button
+                  key={sub.name}
+                  onClick={() => setSubCategory(sub.name)}
+                  className={`${chipBase} py-1.5 px-4 rounded-xl ${
+                    subCategory === sub.name ? activeChip : inactiveChip
+                  }`}
+                >
+                  {sub.label}
+                </button>
+              ))}
+            </div>
+          </section>
+
+          {/* TYPE */}
+          <section>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#C9A24D] mb-4">
+              Looking For
+            </p>
+            <div className="flex gap-2">
+              {(['rent', 'sale'] as DealType[]).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setType(t)}
+                  className={`${chipBase} flex-1 py-3 rounded-xl ${
+                    type === t ? activeChip : inactiveChip
+                  }`}
+                >
+                  {t === 'rent' ? 'To Rent' : 'To Buy'}
+                </button>
+              ))}
+            </div>
+          </section>
+
+          {/* CITY & AREA GRID */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+            <section>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#C9A24D] mb-4">
+                City
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {cities.map((c) => (
+                  <button
+                    key={c.label}
+                    onClick={() => {
+                      setCity(c.label);
+                      setArea('');
+                    }}
+                    className={`${chipBase} py-1.5 px-4 rounded-xl ${
+                      city === c.label ? activeChip : inactiveChip
+                    }`}
+                  >
+                    {c.label}
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            <section>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#C9A24D] mb-4">
+                Area (Optional)
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {areas
+                  .filter((a) => !city || a.city === city)
+                  .map((a) => (
+                    <button
+                      key={a.label}
+                      onClick={() => setArea(a.label)}
+                      className={`${chipBase} py-1.5 px-4 rounded-xl ${
+                        area === a.label ? activeChip : inactiveChip
+                      }`}
+                    >
+                      {a.label}
+                    </button>
+                  ))}
+              </div>
+            </section>
           </div>
         </div>
 
-        {/* CTA */}
-        <div className="flex justify-between items-center">
+        {/* Footer */}
+        <div className="p-6 sm:p-8 bg-[#F4EFE9]/50 border-t border-[#F4EFE9] flex items-center justify-between gap-6">
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-black transition"
+            className="text-xs font-bold uppercase tracking-widest text-[#6B6B6B] hover:text-[#1F1F1F] transition-colors"
           >
             Cancel
           </button>
 
           <button
             onClick={() => {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const payload: any = {
                 category,
                 subCategory,
@@ -216,9 +236,9 @@ export default function PropertySearchModal({
 
               onSearch(payload);
             }}
-            className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#6f4e37] to-[#c6a15b] text-white font-semibold shadow-lg hover:scale-[1.03] transition-all"
+            className="flex-1 sm:flex-none px-10 py-4 rounded-2xl bg-[#1F1F1F] text-white font-bold text-sm uppercase tracking-widest shadow-xl hover:bg-[#C9A24D] transition-all duration-300"
           >
-            Search Properties →
+            Show Results
           </button>
         </div>
       </div>

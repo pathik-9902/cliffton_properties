@@ -1,9 +1,9 @@
 'use client';
 
-import { Search } from 'lucide-react';
+import { Search, MapPin } from 'lucide-react';
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { parseSearch } from '@/lib/config/search/parseSearch';
-import { SEARCH_SUGGESTIONS } from '@/lib/config/search/searchData';
+import { useFilterOptions } from '@/lib/hooks/useFilterOptions';
 import FeaturedListingCarousel from '@/components/property/FeaturedListingCarousel';
 
 // ---------------- TYPES ----------------
@@ -13,6 +13,7 @@ type Property = {
   city: string;
   area?: string;
   price: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   images: any[];
 };
 
@@ -21,6 +22,16 @@ export default function SearchSection() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const { options } = useFilterOptions();
+
+  const SEARCH_SUGGESTIONS = useMemo(() => {
+    if (!options) return [];
+    return [
+      ...options.cities.map(c => ({ label: c, type: 'city' })),
+      ...options.areas.map(a => ({ label: a.label, type: 'area', city: a.city }))
+    ];
+  }, [options]);
 
   const [showModal, setShowModal] = useState(false);
 
@@ -77,7 +88,7 @@ export default function SearchSection() {
 
   // ---------------- BUILD QUERY ----------------
   const buildQuery = (type: 'rent' | 'sale') => {
-    const parsed = parseSearch(search);
+    const parsed = parseSearch(search, SEARCH_SUGGESTIONS);
     const params = new URLSearchParams();
 
     params.set('listing', type);
@@ -91,6 +102,7 @@ export default function SearchSection() {
     return `/properties?${params.toString()}`;
   };
 
+
   // ---------------- ENTER KEY ----------------
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -100,13 +112,13 @@ export default function SearchSection() {
 
   return (
     <>
-      <section className="-mt-16 relative z-10">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6">
-          <div className="rounded-2xl bg-white p-4 sm:p-6 shadow-xl border border-[#eee5db] space-y-4 sm:space-y-5">
+      <section className="-mt-12 sm:-mt-24 relative z-10">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="rounded-[2.5rem] bg-white/95 backdrop-blur-md p-5 sm:p-8 shadow-2xl border border-[#ede5db] space-y-5 sm:space-y-6">
 
             {/* ---------------- CAROUSEL ---------------- */}
             {loading ? (
-              <div className="h-44 sm:h-52 md:h-64 lg:h-72 rounded-xl bg-gray-100 animate-pulse" />
+              <div className="h-48 sm:h-72 rounded-[2rem] bg-gray-100 animate-pulse" />
             ) : (
               <FeaturedListingCarousel properties={properties} />
             )}
@@ -114,11 +126,13 @@ export default function SearchSection() {
             {/* ---------------- SEARCH ---------------- */}
             <div
               ref={wrapperRef}
-              className="relative flex flex-col sm:flex-row gap-3 sm:gap-4"
+              className="flex flex-col md:flex-row gap-4"
             >
               {/* INPUT */}
-              <div className="relative flex flex-grow items-center gap-2 rounded-xl border border-[#e6ddcf] px-4 py-3">
-                <Search className="h-4 w-4 text-gray-400" />
+              <div className="relative group flex-grow">
+                <div className="absolute left-5 top-1/2 -translate-y-1/2 pointer-events-none transition-colors group-focus-within:text-[#C9A24D]">
+                  <Search size={20} className="text-gray-400 group-focus-within:text-[#C9A24D]" />
+                </div>
 
                 <input
                   value={search}
@@ -128,13 +142,13 @@ export default function SearchSection() {
                   }}
                   onFocus={() => setShowDropdown(true)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Search city, area, or BHK (e.g. '2 BHK in Vesu')"
-                  className="w-full text-sm outline-none"
+                  placeholder="Where would you like to live?"
+                  className="w-full bg-[#f8f6f2] rounded-2xl sm:rounded-3xl pl-14 pr-6 py-4 sm:py-5 text-sm sm:text-base outline-none border-2 border-transparent focus:border-[#C9A24D]/30 focus:bg-white transition-all duration-300"
                 />
 
                 {/* DROPDOWN */}
                 {showDropdown && filteredSuggestions.length > 0 && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-white border rounded-xl shadow-lg z-50 max-h-60 overflow-y-auto">
+                  <div className="absolute top-full left-0 right-0 mt-3 bg-white border border-[#E8E2DA] rounded-2xl shadow-2xl z-50 max-h-72 overflow-y-auto overflow-x-hidden">
                     {filteredSuggestions.map((item) => (
                       <div
                         key={item.label}
@@ -142,8 +156,9 @@ export default function SearchSection() {
                           setSearch(item.label);
                           setShowDropdown(false);
                         }}
-                        className="px-4 py-2 text-sm hover:bg-[#f5efe7] cursor-pointer"
+                        className="px-6 py-4 text-sm sm:text-base hover:bg-[#fcfaf7] cursor-pointer flex items-center gap-3 border-b border-[#f5efe7] last:border-0"
                       >
+                        <MapPin size={16} className="text-[#C9A24D]" />
                         {item.label}
                       </div>
                     ))}
@@ -154,10 +169,9 @@ export default function SearchSection() {
               {/* BUTTON */}
               <button
                 onClick={() => setShowModal(true)}
-                className="flex items-center justify-center gap-2 rounded-xl bg-[#6f4e37] px-5 sm:px-6 py-3 text-sm font-bold text-white hover:bg-[#5a3f2d] transition"
+                className="w-full md:w-auto flex items-center justify-center gap-3 rounded-2xl sm:rounded-3xl bg-[#1F1F1F] px-8 sm:px-10 py-4 sm:py-5 text-sm sm:text-base font-bold text-white hover:bg-[#C9A24D] transition-all duration-300 shadow-xl active:scale-95"
               >
-                <Search className="h-4 w-4" />
-                Search
+                Find Properties
               </button>
             </div>
           </div>
@@ -186,7 +200,7 @@ export default function SearchSection() {
                 onClick={() => {
                   window.location.href = buildQuery('sale');
                 }}
-                className="flex-1 bg-[#6f4e37] text-white py-3 rounded-xl font-semibold hover:bg-[#5a3f2d]"
+                className="flex-1 bg-[#1F1F1F] text-white py-3 rounded-xl font-semibold hover:bg-[#C9A24D] transition-colors"
               >
                 Buy
               </button>
@@ -195,7 +209,7 @@ export default function SearchSection() {
                 onClick={() => {
                   window.location.href = buildQuery('rent');
                 }}
-                className="flex-1 bg-[#ede3d5] text-[#6f4e37] py-3 rounded-xl font-semibold"
+                className="flex-1 bg-[#f8f6f2] text-[#1F1F1F] border border-[#E8E2DA] hover:border-[#C9A24D] py-3 rounded-xl font-semibold transition-colors"
               >
                 Rent
               </button>

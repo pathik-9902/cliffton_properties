@@ -3,6 +3,8 @@
 import Image from 'next/image';
 import useEmblaCarousel from 'embla-carousel-react';
 import { useCallback, useEffect, useState } from 'react';
+import { cloudinaryUrl } from '@/lib/cloudinary';
+
 
 type Props = {
   images: { public_id: string }[];
@@ -39,9 +41,10 @@ export default function ImageCarousel({ images, title }: Props) {
           {images.map((img, idx) => (
             <div key={idx} className="relative min-w-full h-[320px] md:h-[520px]">
               <Image
-                src={img.public_id}
+                src={cloudinaryUrl(img.public_id, { width: 1200 })}
                 alt={`${title} ${idx + 1}`}
                 fill
+                unoptimized
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 60vw"
                 className="object-cover"
                 priority={idx === 0}

@@ -1,43 +1,5 @@
 import { NextResponse } from 'next/server';
-
-import propertiesData from '@/data/properties.json';
-import imagesData from '@/data/property_images.json';
-import residentialData from '@/data/residential_details.json';
-import commercialData from '@/data/commercial_details.json';
-import landData from '@/data/land_details.json';
-
-/* ---------------- BUILD ---------------- */
-
-function buildProperties() {
-  const residentialMap = new Map(
-    residentialData.residential_details.map((r) => [r.property_id, r])
-  );
-
-  const commercialMap = new Map(
-    commercialData.commercial_details.map((c) => [c.property_id, c])
-  );
-
-  const landMap = new Map(
-    landData.land_details.map((l) => [l.property_id, l])
-  );
-
-  const imagesMap = new Map<string, any[]>();
-
-  imagesData.property_images.forEach((img) => {
-    if (!imagesMap.has(img.property_id)) {
-      imagesMap.set(img.property_id, []);
-    }
-    imagesMap.get(img.property_id)!.push(img);
-  });
-
-  return propertiesData.properties.map((p) => ({
-    ...p,
-    images: imagesMap.get(p.id) || [],
-    residential_details: residentialMap.get(p.id),
-    commercial_details: commercialMap.get(p.id),
-    land_details: landMap.get(p.id),
-  }));
-}
+import { supabase } from '@/lib/supabase';
 
 /* ---------------- HANDLER ---------------- */
 
@@ -46,15 +8,50 @@ export async function GET(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    // ✅ IMPORTANT FIX
     const { id } = await context.params;
 
-    const all = buildProperties();
+    const { data, error } = await supabase
+      .from('properties')
+      .select(`
+        *,
+        images:property_images(*),
+        residential_details(*),
+        commercial_details(*),
+        land_details(*)
+      `)
+      .eq('id', id)
+      .single();
 
-    const property = all.find((p) => p.id === id);
+    if (error) {
+      if (error.code === 'PGRST116') {
+        // PG result not found
+        return NextResponse.json({ data: null });
+      }
+      throw error;
+    }
+
+    if (!data) {
+      return NextResponse.json({ data: null });
+    }
+
+    const formattedProperty = {
+      ...data,
+      images: Array.isArray(data.images)
+        ? [...data.images].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+        : [],
+      residential_details: Array.isArray(data.residential_details)
+        ? data.residential_details[0]
+        : data.residential_details || null,
+      commercial_details: Array.isArray(data.commercial_details)
+        ? data.commercial_details[0]
+        : data.commercial_details || null,
+      land_details: Array.isArray(data.land_details)
+        ? data.land_details[0]
+        : data.land_details || null,
+    };
 
     return NextResponse.json({
-      data: property ?? null,
+      data: formattedProperty,
     });
   } catch (error) {
     console.error('DETAIL API ERROR:', error);

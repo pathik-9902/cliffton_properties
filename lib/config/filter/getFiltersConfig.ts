@@ -1,49 +1,42 @@
 import { FILTERS_CONFIG, FilterConfig } from '@/lib/config/filter/filters';
+import { SearchAndFilterOptions } from '@/lib/services/fetchOptions';
 
-import {
-  getDynamicCities,
-  getDynamicAreas,
-  getDynamicBHK,
-  getDynamicResidentialTypes,
-  getDynamicCommercialTypes,
-  getDynamicLandTypes,
-} from './dynamicFilter';
-
-/* ---------------- CACHE ---------------- */
-
-const configCache = new Map<string, FilterConfig[]>();
-
-/* ---------------- INJECTOR ---------------- */
+function toOptions(values: string[], includeAll = true) {
+  const opts = values.map((v) => ({ label: v, value: v }));
+  if (includeAll) return [{ label: 'All', value: '' }, ...opts];
+  return opts;
+}
 
 function injectDynamicOptions(
   filters: FilterConfig[],
-  category: string
+  category: string,
+  options: SearchAndFilterOptions
 ): FilterConfig[] {
   return filters.map((filter) => {
     switch (filter.key) {
       /* -------- COMMON -------- */
       case 'city':
-        return { ...filter, options: getDynamicCities() };
+        return { ...filter, options: toOptions(options.cities) };
 
       case 'area':
-        return { ...filter, options: getDynamicAreas() };
+        return { ...filter, options: toOptions(options.areas.map(a => a.label)) };
 
       /* -------- RESIDENTIAL -------- */
       case 'bedrooms':
         if (category === 'residential') {
-          return { ...filter, options: getDynamicBHK() };
+          return { ...filter, options: toOptions(options.bedrooms) };
         }
         return filter;
 
       case 'subtype':
         if (category === 'residential') {
-          return { ...filter, options: getDynamicResidentialTypes() };
+          return { ...filter, options: toOptions(options.residentialTypes) };
         }
         if (category === 'commercial') {
-          return { ...filter, options: getDynamicCommercialTypes() };
+          return { ...filter, options: toOptions(options.commercialTypes) };
         }
         if (category === 'land') {
-          return { ...filter, options: getDynamicLandTypes() };
+          return { ...filter, options: toOptions(options.landTypes) };
         }
         return filter;
 
@@ -53,22 +46,13 @@ function injectDynamicOptions(
   });
 }
 
-/* ---------------- MAIN FUNCTION ---------------- */
-
-export function getFiltersConfig(category: string): FilterConfig[] {
-  if (configCache.has(category)) {
-    return configCache.get(category)!;
-  }
-
+export function buildFiltersConfig(category: string, options: SearchAndFilterOptions | null): FilterConfig[] {
   const base = FILTERS_CONFIG.common ?? [];
-  const categoryConfig =
-    FILTERS_CONFIG[category as keyof typeof FILTERS_CONFIG] ?? [];
+  const categoryConfig = FILTERS_CONFIG[category as keyof typeof FILTERS_CONFIG] ?? [];
 
   const merged = [...base, ...categoryConfig];
 
-  const finalConfig = injectDynamicOptions(merged, category);
+  if (!options) return merged;
 
-  configCache.set(category, finalConfig);
-
-  return finalConfig;
+  return injectDynamicOptions(merged, category, options);
 }

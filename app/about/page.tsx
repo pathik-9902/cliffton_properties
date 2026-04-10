@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import {
   Building2,
   ShieldCheck,
@@ -127,32 +128,32 @@ export default function AboutPage() {
           </h2>
 
           <p className="mx-auto mt-4 max-w-xl text-[#6B6B6B]">
-            Whether you're looking to explore properties, list your own, or get in touch —
+            Whether you&apos;re looking to explore properties, list your own, or get in touch —
             we’re here to help you every step of the way.
           </p>
 
           <div className="mt-8 flex justify-center gap-4 flex-wrap">
-            <a
+            <Link
               href="/properties"
               className="group inline-flex items-center gap-2 rounded-2xl bg-black px-6 py-3 text-sm font-medium text-white transition-all duration-300 hover:opacity-90 hover:scale-[1.02]"
             >
               Browse Properties
               <ArrowRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
-            </a>
+            </Link>
 
-            <a
+            <Link
               href="/want-to-list"
               className="inline-flex items-center gap-2 rounded-2xl border border-[#1F1F1F] px-6 py-3 text-sm font-medium transition-all duration-300 hover:bg-black hover:text-white"
             >
               List Property
-            </a>
+            </Link>
 
-            <a
+            <Link
               href="/contact"
               className="inline-flex items-center gap-2 rounded-2xl border border-[#1F1F1F] px-6 py-3 text-sm font-medium transition-all duration-300 hover:bg-black hover:text-white"
             >
               Contact
-            </a>
+            </Link>
           </div>
         </div>
       </section>

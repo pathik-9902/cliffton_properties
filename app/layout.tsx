@@ -1,11 +1,25 @@
+import { Inter } from 'next/font/google';
+import type { Metadata, Viewport } from 'next';
 import Footer from '@/components/layout/Footer';
 import Navbar from '@/components/layout/Navbar';
 import './globals.css';
 
-export const metadata = {
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+});
+
+export const metadata: Metadata = {
   title: 'Cliffton Group | Premium Real Estate',
   description:
-    'Residential, Commercial, Industrial and Land properties for Rent and Sale',
+    'Residential, Commercial, Industrial and Land properties for Rent and Sale in Surat.',
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#F4EFE9',
 };
 
 export default function RootLayout({
@@ -14,14 +28,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" data-scroll-behavior="smooth">
-      <body className="bg-[#F4E9DD] text-[#0F0F0F] antialiased">
+    <html
+      lang="en"
+      className={`${inter.variable} scroll-smooth`}
+      data-scroll-behavior="smooth"
+    >
+      <body className="bg-[#F4EFE9] text-[#1F1F1F] font-sans antialiased">
         <Navbar />
-
-        <main className="max-w-7xl mx-auto px-6 md:px-12 py-12">
-          {children}
-        </main>
-
+        {children}
         <Footer />
       </body>
     </html>

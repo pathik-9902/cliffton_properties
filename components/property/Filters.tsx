@@ -10,14 +10,16 @@ import {
   useCallback,
 } from 'react';
 
-import { getFiltersConfig } from '@/lib/config/filter/getFiltersConfig';
+import { buildFiltersConfig } from '@/lib/config/filter/getFiltersConfig';
 import { FilterConfig } from '@/lib/config/filter/filters';
+import { useFilterOptions } from '@/lib/hooks/useFilterOptions';
 
 /* ---------------- TYPES ---------------- */
 
 type Props = {
   category: string;
   initialFilters?: Record<string, string>;
+  onApply?: () => void;
 };
 
 /* ---------------- UI TOKENS ---------------- */
@@ -34,13 +36,13 @@ const ui = {
     'w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-300 transition',
 
   chip:
-    'px-3 py-1.5 rounded-full text-xs transition border',
+    'px-3.5 py-1.5 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all border',
 
   chipActive:
-    'bg-black text-white border-black shadow-sm',
+    'bg-[#1F1F1F] text-white border-[#1F1F1F] shadow-md',
 
   chipInactive:
-    'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100',
+    'bg-[#F8F6F2] text-[#6B6B6B] border-transparent hover:bg-[#C9A24D]/10 hover:text-[#C9A24D]',
 
   buttonBase:
     'text-sm font-medium rounded-full transition',
@@ -59,6 +61,7 @@ const ui = {
 export default function Filters({
   category,
   initialFilters = {},
+  onApply,
 }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -82,13 +85,15 @@ export default function Filters({
 
   /* ---------------- CONFIG ---------------- */
 
+  const { options } = useFilterOptions();
+
   const config: FilterConfig[] = useMemo(() => {
-    const raw = getFiltersConfig(category);
+    const raw = buildFiltersConfig(category, options);
 
     return raw.sort(
       (a, b) => (a.priority || 999) - (b.priority || 999)
     );
-  }, [category]);
+  }, [category, options]);
 
   /* ---------------- GROUPING ---------------- */
 
@@ -117,6 +122,7 @@ export default function Filters({
 
     if (!obj.type) obj.type = 'sale';
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setFilters(obj);
     setMinPrice(obj.minPrice || '');
     setMaxPrice(obj.maxPrice || '');
@@ -349,10 +355,22 @@ export default function Filters({
           )
         )}
 
+        {/* APPLY BUTTON (MOBILE) */}
+        {onApply && (
+          <div className="pt-6 border-t border-gray-200">
+            <button
+              onClick={onApply}
+              className="w-full bg-black text-white py-4 rounded-2xl font-bold uppercase tracking-widest text-sm shadow-xl active:scale-95 transition-all"
+            >
+              Apply & View
+            </button>
+          </div>
+        )}
+
         {/* LOADING */}
         {isPending && (
-          <div className="text-xs text-gray-500 animate-pulse">
-            Updating results...
+          <div className="text-xs text-[#C9A24D] font-bold animate-pulse text-center">
+            Refining Results...
           </div>
         )}
       </div>

@@ -67,7 +67,7 @@ export default function ListingClient({
         const data: ApiResponse = await res.json();
         setResponse(data);
       } catch (err) {
-        if ((err as any).name !== 'AbortError') {
+        if ((err as Error).name !== 'AbortError') {
           console.error('Fetch error:', err);
         }
       } finally {
@@ -108,24 +108,56 @@ export default function ListingClient({
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
-        {/* MOBILE FILTER */}
-        <div className="lg:hidden mb-6">
-          <details className="bg-white rounded-2xl shadow-sm border border-[#E8E2DA] overflow-hidden">
-            <summary className="cursor-pointer px-5 py-4 font-medium text-sm">
-              Filters
-            </summary>
-
-            <div className="p-5 border-t border-[#E8E2DA]">
-              <Filters category={category} initialFilters={filters} />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
+        {/* MOBILE FILTER TRIGGER */}
+        <div className="lg:hidden mb-8">
+          <button
+            onClick={() => {
+              const el = document.getElementById('mobile-filters');
+              if (el) el.classList.remove('translate-y-full');
+            }}
+            className="w-full bg-white border-2 border-[#E8E2DA] py-4 rounded-2xl font-bold text-sm tracking-widest uppercase flex items-center justify-center gap-3 shadow-sm active:scale-[0.98] transition-all"
+          >
+            <span>Filter Properties</span>
+            <div className="bg-[#C9A24D] text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]">
+              {Object.keys(filters).length}
             </div>
-          </details>
+          </button>
+        </div>
+
+        {/* MOBILE FILTER MODAL (SLIDE UP) */}
+        <div 
+          id="mobile-filters"
+          className="lg:hidden fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm transition-transform duration-500 translate-y-full"
+        >
+          <div className="absolute bottom-0 left-0 right-0 bg-[#F4EFE9] rounded-t-[2.5rem] p-8 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-8">
+              <h2 className="text-xl font-bold uppercase tracking-widest">Filters</h2>
+              <button 
+                onClick={() => {
+                  const el = document.getElementById('mobile-filters');
+                  if (el) el.classList.add('translate-y-full');
+                }}
+                className="text-[#6B6B6B] font-bold text-sm uppercase"
+              >
+                Close
+              </button>
+            </div>
+            <Filters 
+              category={category} 
+              initialFilters={filters} 
+              onApply={() => {
+                const el = document.getElementById('mobile-filters');
+                if (el) el.classList.add('translate-y-full');
+              }}
+            />
+          </div>
         </div>
 
         <div className="flex gap-10">
           {/* DESKTOP FILTER */}
           <aside className="w-80 hidden lg:block">
-            <div className="sticky top-28 bg-white rounded-3xl border border-[#E8E2DA] shadow-sm p-6">
+            <div className="sticky top-28 bg-white rounded-[2rem] border border-[#E8E2DA] shadow-sm p-8">
               <Filters category={category} initialFilters={filters} />
             </div>
           </aside>

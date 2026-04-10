@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import PropertySearchModal from '@/components/property/PropertySearchModal';
@@ -103,14 +104,20 @@ export default function HeroSection(): React.ReactNode {
       {CAROUSEL_SLIDES.map((slide, index) => (
         <div
           key={slide.image}
-          className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentImageIndex ? 'opacity-100' : 'opacity-0'
-            }`}
-          style={{
-            backgroundImage: `url('${slide.image}')`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        />
+          className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+            index === currentImageIndex ? 'opacity-100' : 'opacity-0'
+          }`}
+        >
+          <Image
+            src={slide.image}
+            alt="Hero Background"
+            fill
+            priority={index === 0}
+            className="object-cover"
+            sizes="100vw"
+            quality={85}
+          />
+        </div>
       ))}
 
       {/* Overlay */}
@@ -120,20 +127,21 @@ export default function HeroSection(): React.ReactNode {
       {/* Content */}
       <div className="relative mx-auto w-full max-w-7xl px-6 py-28 text-white z-10 flex flex-col justify-center">
 
-        <div className="relative min-h-[180px] sm:min-h-[220px] md:min-h-[240px] w-full flex items-center">
+        <div className="relative min-h-[220px] sm:min-h-[260px] md:min-h-[280px] w-full flex items-center">
           {CAROUSEL_SLIDES.map((slide, index) => (
             <div
               key={`text-${index}`}
-              className={`absolute inset-0 transition-all duration-1000 ease-in-out flex flex-col justify-center ${index === currentImageIndex
+              className={`absolute inset-0 transition-all duration-1000 ease-in-out flex flex-col justify-center ${
+                index === currentImageIndex
                   ? 'opacity-100 translate-y-0'
                   : 'opacity-0 translate-y-4 pointer-events-none'
-                }`}
+              }`}
             >
-              <h1 className="max-w-3xl text-4xl font-extrabold leading-tight sm:text-5xl lg:text-6xl drop-shadow-md whitespace-pre-line">
+              <h1 className="max-w-3xl text-3xl leading-[1.15] font-extrabold sm:text-5xl lg:text-7xl drop-shadow-md whitespace-pre-line sm:leading-tight">
                 {slide.title}
               </h1>
 
-              <p className="mt-4 sm:mt-6 max-w-2xl text-base sm:text-lg md:text-xl text-white/90 drop-shadow-md">
+              <p className="mt-4 sm:mt-6 max-w-xl text-sm sm:text-lg md:text-xl text-white/90 drop-shadow-md leading-relaxed">
                 {slide.description}
               </p>
             </div>

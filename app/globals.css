@@ -1,4 +1,9 @@
 @import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-inter);
+}
+
 /* Hide scrollbar completely */
 .no-scrollbar::-webkit-scrollbar {
   display: none;

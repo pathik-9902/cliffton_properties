@@ -19,7 +19,13 @@ const nextConfig: NextConfig = {
         hostname: 'images.unsplash.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        pathname: '/**',
+      },
     ],
+    qualities: [75, 85],
   },
 
   // ✅ Turbopack explicitly enabled (avoids config conflict warning)
@@ -30,12 +36,6 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ['lucide-react'],
   },
 
-  // ✅ Optional debugging (can remove later)
-  logging: {
-    fetches: {
-      fullUrl: true,
-    },
-  },
 };
 
 export default nextConfig;

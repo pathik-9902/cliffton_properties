@@ -3,6 +3,9 @@
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
+import { cloudinaryUrl } from '@/lib/cloudinary';
+
 
 // ---------------- TYPES ----------------
 type Property = {
@@ -11,6 +14,7 @@ type Property = {
   city: string;
   area?: string;
   price: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   images: any[];
 };
 
@@ -31,10 +35,11 @@ export default function FeaturedListingCarousel({ properties }: Props) {
 
   // ---------------- RESET INDEX ----------------
   useEffect(() => {
-    if (index >= properties.length) {
+    if (index >= properties.length && properties.length > 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIndex(0);
     }
-  }, [properties]);
+  }, [properties, index]);
 
   // ---------------- AUTO PLAY ----------------
   useEffect(() => {
@@ -50,17 +55,19 @@ export default function FeaturedListingCarousel({ properties }: Props) {
   }, [paused, properties]);
 
   // ---------------- SAFE IMAGE ----------------
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const getImageSrc = (images: any[]) => {
     if (!images?.length) return '/placeholder.png';
 
     const first = images[0];
 
-    if (typeof first === 'string') return first;
+    if (typeof first === 'string') {
+      return cloudinaryUrl(first);
+    }
 
     if (typeof first === 'object') {
-      if (first.public_id) return first.public_id; // ✅ FIX
-      if (first.url) return first.url;
-      if (first.src) return first.src;
+      const rawId = first.public_id || first.url || first.src || '';
+      return cloudinaryUrl(rawId) || '/placeholder.png';
     }
 
     return '/placeholder.png';
@@ -70,7 +77,7 @@ export default function FeaturedListingCarousel({ properties }: Props) {
   useEffect(() => {
     if (properties.length > 1) {
       const next = properties[(index + 1) % properties.length];
-      const img = new Image();
+      const img = new globalThis.Image();
       img.src = getImageSrc(next.images);
     }
   }, [index, properties]);
@@ -138,15 +145,14 @@ export default function FeaturedListingCarousel({ properties }: Props) {
           transition={{ duration: 0.5 }}
           className="absolute inset-0"
         >
-          <img
+          <Image
             src={imageSrc}
             alt={property.title}
-            className="w-full h-full object-cover"
-            loading="eager"
-            onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src =
-                '/placeholder.png';
-            }}
+            fill
+            className="object-cover"
+            priority
+            unoptimized
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
           />
 
           {/* OVERLAY */}

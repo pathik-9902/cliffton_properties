@@ -15,8 +15,6 @@ export interface Property {
   area?: string;
   price: number;
   verified: boolean;
-  views_count?: number;
-  enquiries_count?: number;
   created_at: string;
   updated_at: string;
 }
@@ -29,11 +27,11 @@ export interface ResidentialProperty {
   balconies: number;
   furnishing_type: string;
   floor: string;
-  parking_spaces: number;
-  lift: boolean;
-  property_age: number;
   carpet_area: number;
-  amenity?: string;
+  parking_spaces: number;
+  property_age: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  amenities?: string[] | any;
 }
 
 export interface CommercialProperty {
@@ -63,8 +61,10 @@ export interface LandProperty {
 
 export interface PropertyImage {
   id: string;
+  property_id: string;
   public_id: string;
   sort_order: number;
+  created_at: string;
 }
 
 export type FullPropertyDetails = Property & {

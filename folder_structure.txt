@@ -5,7 +5,11 @@
 │   ├── api
 │   │   ├── contact
 │   │   │   └── route.ts
+│   │   ├── options
+│   │   │   └── route.ts
 │   │   └── properties
+│   │       ├── [id]
+│   │       │   └── route.ts
 │   │       └── route.ts
 │   ├── contact
 │   │   └── page.tsx
@@ -38,21 +42,21 @@
 │       ├── Filters.tsx
 │       ├── PropertyCard.tsx
 │       └── PropertySearchModal.tsx
-├── data
-│   ├── commercial_details.json
-│   ├── data.json
-│   ├── land_details.json
-│   ├── properties.json
-│   ├── property_images.json
-│   └── residential_details.json
 ├── eslint.config.mjs
 ├── folder_structure.txt
 ├── lib
-│   └── config
-│       ├── filters.ts
-│       ├── getFiltersConfig.ts
-│       ├── parseSearch.ts
-│       └── searchData.ts
+│   ├── cloudinary.ts
+│   ├── config
+│   │   ├── filter
+│   │   │   ├── filters.ts
+│   │   │   └── getFiltersConfig.ts
+│   │   └── search
+│   │       └── parseSearch.ts
+│   ├── hooks
+│   │   └── useFilterOptions.ts
+│   ├── services
+│   │   └── fetchOptions.ts
+│   └── supabase.ts
 ├── next.config.ts
 ├── next-env.d.ts
 ├── package.json
@@ -94,8 +98,9 @@
 │       └── p_img5.jpeg
 ├── README.md
 ├── tsconfig.json
+├── tsconfig.tsbuildinfo
 ├── txt.txt
 └── types
     └── property.ts
 
-24 directories, 75 files
+29 directories, 75 files
