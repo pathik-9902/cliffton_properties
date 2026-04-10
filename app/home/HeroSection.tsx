@@ -61,9 +61,11 @@ const CAROUSEL_SLIDES = [
 export default function HeroSection(): React.ReactNode {
   const [open, setOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [mounted, setMounted] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
+    setMounted(true);
     const interval = setInterval(() => {
       setCurrentImageIndex(
         (prevIndex) => (prevIndex + 1) % CAROUSEL_SLIDES.length
@@ -105,19 +107,19 @@ export default function HeroSection(): React.ReactNode {
         <div
           key={slide.image}
           className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-            index === currentImageIndex ? 'opacity-100' : 'opacity-0'
+            index === currentImageIndex ? 'opacity-100 z-10' : 'opacity-0 z-0'
           }`}
         >
           <Image
             src={slide.image}
             alt="Hero Background"
             fill
+            unoptimized
             priority={index === 0}
             className={`object-cover transition-transform duration-[10000ms] ease-out ${
               index === currentImageIndex ? 'scale-110' : 'scale-100'
             }`}
             sizes="100vw"
-            quality={85}
           />
         </div>
       ))}

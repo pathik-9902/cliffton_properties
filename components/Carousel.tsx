@@ -47,7 +47,6 @@ export default function ImageCarousel({ images, title }: Props) {
                 unoptimized
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 60vw"
                 className="object-cover"
-                priority={idx === 0}
               />
               {/* Gradient */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />

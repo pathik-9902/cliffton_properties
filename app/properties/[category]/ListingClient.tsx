@@ -182,7 +182,6 @@ export default function ListingClient({
                     >
                       <PropertyCard
                         property={property}
-                        priority={index < 3}
                       />
                     </div>
                   ))}

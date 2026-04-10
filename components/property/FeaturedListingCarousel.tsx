@@ -150,7 +150,6 @@ export default function FeaturedListingCarousel({ properties }: Props) {
             alt={property.title}
             fill
             className="object-cover"
-            priority
             unoptimized
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
           />
