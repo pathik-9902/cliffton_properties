@@ -329,7 +329,7 @@ function Spec({ label, value }: any) {
     <div className="bg-[#F4EFE9] p-4 rounded-xl">
       <p className="text-xs text-[#6B6B6B] mb-1">{label}</p>
       <p className="text-sm font-medium capitalize">
-        {value.toString()}
+        {typeof value === 'string' ? value.replace(/_/g, ' ') : value.toString()}
       </p>
     </div>
   );

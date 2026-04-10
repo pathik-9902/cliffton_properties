@@ -39,7 +39,10 @@ export default function PropertySearchModal({
 
   const categoryMap: Record<CategoryType, SubCategory[]> = useMemo(() => {
     if (!options) return { residential: [], commercial: [], land: [] };
-    const toSub = (arr: string[]) => arr.map(s => ({ name: s, label: s }));
+    const toSub = (arr: string[]) => arr.map(s => ({ 
+      name: s, 
+      label: s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) 
+    }));
     
     return {
       residential: options.residentialTypes.length ? toSub(options.residentialTypes) : toSub(['Villa', 'Apartment']),

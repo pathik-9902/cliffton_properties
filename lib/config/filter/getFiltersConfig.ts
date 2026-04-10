@@ -2,7 +2,10 @@ import { FILTERS_CONFIG, FilterConfig } from '@/lib/config/filter/filters';
 import { SearchAndFilterOptions } from '@/lib/services/fetchOptions';
 
 function toOptions(values: string[], includeAll = true) {
-  const opts = values.map((v) => ({ label: v, value: v }));
+  const opts = values.map((v) => ({ 
+    label: typeof v === 'string' ? v.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()) : v, 
+    value: v 
+  }));
   if (includeAll) return [{ label: 'All', value: '' }, ...opts];
   return opts;
 }

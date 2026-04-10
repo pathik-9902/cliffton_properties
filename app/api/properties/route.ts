@@ -56,11 +56,11 @@ export async function GET(request: Request) {
     // Build select string — only join relevant detail tables
     let detailSelect = '';
     if (normalizedCategory === 'residential') {
-      detailSelect = 'residential_details(*)';
+      detailSelect = 'residential_details!inner(*)';
     } else if (normalizedCategory === 'commercial') {
-      detailSelect = 'commercial_details(*)';
+      detailSelect = 'commercial_details!inner(*)';
     } else if (normalizedCategory === 'land') {
-      detailSelect = 'land_details(*)';
+      detailSelect = 'land_details!inner(*)';
     } else {
       detailSelect = 'residential_details(*),commercial_details(*),land_details(*)';
     }
