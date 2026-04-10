@@ -42,9 +42,9 @@ export default function Footer() {
 
           <ul className="space-y-3 text-sm text-[#6B6B6B]">
             {[
-              { label: 'About Us', href: '/about-us' },
+              { label: 'About Us', href: '/about' },
               { label: 'List Property', href: '/want-to-list' },
-              { label: 'Contact', href: '/contact-us' },
+              { label: 'Contact', href: '/contact' },
             ].map((item) => (
               <li key={item.href}>
                 <Link
@@ -67,10 +67,10 @@ export default function Footer() {
 
           <ul className="space-y-3 text-sm text-[#6B6B6B]">
             {[
-              { label: 'Residential', href: '/residential/sale' },
-              { label: 'Commercial', href: '/commercial/sale' },
-              { label: 'Industrial', href: '/industrial/sale' },
-              { label: 'Land', href: '/land/sale' },
+              { label: 'Residential', href: '/properties/residential' },
+              { label: 'Commercial', href: '/properties/commercial' },
+              { label: 'Industrial', href: '/properties/industrial' },
+              { label: 'Land', href: '/properties/land' },
             ].map((item) => (
               <li key={item.href}>
                 <Link

@@ -99,7 +99,7 @@ export default function SearchSection() {
 
     if (search.trim()) params.set('search', search.trim());
 
-    return `/properties?${params.toString()}`;
+    return `/properties/residential?${params.toString()}`;
   };
 
 

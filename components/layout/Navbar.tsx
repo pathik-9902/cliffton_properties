@@ -18,6 +18,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'About Us', href: '/about' },
   { label: 'Residential', href: '/properties/residential' },
   { label: 'Commercial', href: '/properties/commercial' },
+  { label: 'Industrial', href: '/properties/industrial' },
   { label: 'Land', href: '/properties/land' },
   { label: 'Contact Us', href: '/contact' },
 ];
