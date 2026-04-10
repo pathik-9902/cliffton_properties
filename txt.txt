@@ -5,3 +5,6 @@ git push
 rm -rf .next
 clear
 npm run dev
+
+rm -rf node_modules
+tree > folder_structure.txt

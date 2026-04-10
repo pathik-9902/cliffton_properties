@@ -72,8 +72,12 @@ export default function ContactPage() {
             </div>
 
             {/* TRUST BLOCK */}
-            <div className="bg-white border border-[#E8E2DA] rounded-2xl p-5 text-sm text-[#6B6B6B]">
-              We typically respond within <span className="font-medium text-[#1F1F1F]">24 hours</span>.
+            <div className="bg-[#C9A24D]/5 border border-[#C9A24D]/30 rounded-2xl p-5 text-sm text-[#1F1F1F]/80 shadow-sm flex items-start gap-4">
+              <div className="mt-1 w-2 h-2 rounded-full bg-[#C9A24D] animate-pulse" />
+              <div>
+                <p className="font-medium text-[#1F1F1F] mb-1">Premium Advisory</p>
+                <p>We typically respond to inquiries within <span className="font-semibold text-[#1F1F1F]">24 hours</span>.</p>
+              </div>
             </div>
 
           </div>
@@ -82,13 +86,16 @@ export default function ContactPage() {
           <div className="relative">
 
             {/* subtle gradient */}
-            <div className="absolute inset-0 bg-gradient-to-b from-[#D8CBBE]/40 to-transparent rounded-3xl pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-tr from-[#C9A24D]/10 via-transparent to-transparent rounded-3xl pointer-events-none" />
 
-            <div className="relative z-10 bg-white border border-[#E8E2DA] rounded-3xl p-8 sm:p-10 shadow-sm">
+            <div className="relative z-10 bg-white border border-[#E8E2DA] rounded-3xl p-8 sm:p-10 shadow-xl shadow-[#1F1F1F]/5">
 
               <form onSubmit={handleSubmit} className="space-y-6">
 
-                <Field label="Full Name" name="name" required />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <Field label="Full Name" name="name" required />
+                  <Field label="Email Address" type="email" name="email" required />
+                </div>
 
                 {/* MESSAGE */}
                 <div className="space-y-2">
@@ -101,14 +108,14 @@ export default function ContactPage() {
                     required
                     rows={4}
                     placeholder="Tell us about your requirement…"
-                    className="w-full rounded-xl border border-[#E8E2DA] bg-[#F4EFE9] px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#C9A24D]/30 transition"
+                    className="w-full rounded-2xl border border-[#E8E2DA] bg-[#F8F6F2] px-5 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#C9A24D]/50 focus:border-[#C9A24D]/50 transition-all duration-300"
                   />
                 </div>
 
                 {/* CTA */}
                 <button
                   disabled={loading}
-                  className="w-full bg-black text-white py-3 rounded-xl text-sm font-medium transition-all duration-300 hover:opacity-90 hover:scale-[1.01] disabled:opacity-60"
+                  className="w-full focus:outline-none bg-[#1F1F1F] text-white py-4 rounded-2xl text-sm font-bold uppercase tracking-wider transition-all duration-300 hover:-translate-y-1 hover:bg-[#C9A24D] hover:shadow-lg disabled:opacity-60 disabled:hover:translate-y-0"
                 >
                   {loading ? 'Sending…' : 'Submit Enquiry'}
                 </button>
@@ -152,7 +159,7 @@ function Field({
 
       <input
         {...props}
-        className="w-full rounded-xl border border-[#E8E2DA] bg-[#F4EFE9] px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#C9A24D]/30 transition"
+        className="w-full rounded-2xl border border-[#E8E2DA] bg-[#F8F6F2] px-5 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#C9A24D]/50 focus:border-[#C9A24D]/50 transition-all duration-300"
       />
     </div>
   );

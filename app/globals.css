@@ -2,6 +2,21 @@
 
 @theme {
   --font-sans: var(--font-inter);
+  /* Custom colors */
+  --color-gold: #C9A24D;
+  --color-dark: #1F1F1F;
+  --color-light: #F4EFE9;
+  --color-coffee: #6f4e37;
+}
+
+/* Base configuration */
+::selection {
+  background-color: #C9A24D;
+  color: #ffffff;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 /* Hide scrollbar completely */
@@ -11,4 +26,18 @@
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Custom Utilities */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.text-gradient {
+  background: linear-gradient(to right, #1F1F1F, #6f4e37);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }

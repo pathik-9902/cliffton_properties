@@ -47,17 +47,17 @@ export default function TrustSection() {
 
 function Item({ icon, title, text }: ItemType) {
   return (
-    <div className="text-center group transition">
+    <div className="text-center group transition-all duration-300 hover:-translate-y-2">
       
-      <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-[#ede3d5] text-[#6f4e37] group-hover:bg-[#6f4e37] group-hover:text-white transition">
+      <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#C9A24D]/10 text-[#C9A24D] group-hover:bg-[#C9A24D] group-hover:text-white transition-all duration-500 shadow-sm group-hover:shadow-md">
         {icon}
       </div>
 
-      <h3 className="text-lg font-bold text-[#1f1f1f]">
+      <h3 className="text-xl font-bold text-[#1f1f1f]">
         {title}
       </h3>
 
-      <p className="mt-2 text-sm text-gray-600">
+      <p className="mt-3 text-sm text-gray-500 leading-relaxed max-w-xs mx-auto">
         {text}
       </p>
     </div>

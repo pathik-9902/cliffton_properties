@@ -99,7 +99,7 @@ export default function CategorySection() {
               <div className="absolute inset-0 opacity-0 transition duration-500 group-hover:opacity-100 bg-gradient-to-br from-[#faf7f2] via-transparent to-[#f3ede7]" />
 
               {/* Icon */}
-              <div className="relative mb-4 sm:mb-6 flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-xl sm:rounded-2xl bg-[#f4eee6] text-[#6f4e37] transition-transform duration-300 group-hover:scale-105">
+              <div className="relative mb-4 sm:mb-6 flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-xl sm:rounded-2xl bg-[#C9A24D]/10 text-[#C9A24D] transition-all duration-300 group-hover:scale-110 group-hover:bg-[#C9A24D] group-hover:text-white">
                 {cat.icon}
               </div>
 
@@ -114,8 +114,8 @@ export default function CategorySection() {
               </p>
 
               {/* Hint */}
-              <div className="mt-6 text-xs text-[#6f4e37] opacity-70">
-                Tap to explore →
+              <div className="mt-6 text-xs text-[#C9A24D] opacity-80 font-medium tracking-wide flex items-center gap-1 group-hover:gap-2 transition-all">
+                Tap to explore <span>→</span>
               </div>
             </div>
           ))}
@@ -142,12 +142,12 @@ export default function CategorySection() {
             </h2>
 
             {/* Rent / Buy Toggle */}
-            <div className="flex gap-2 mb-6">
+            <div className="flex gap-2 mb-6 bg-gray-50 p-1 rounded-full w-max border border-gray-100">
               <button
                 onClick={() => setType('sale')}
-                className={`px-4 py-2 rounded-full text-sm ${type === 'sale'
-                    ? 'bg-[#6f4e37] text-white'
-                    : 'bg-gray-100 text-gray-600'
+                className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${type === 'sale'
+                    ? 'bg-[#1F1F1F] text-white shadow-md'
+                    : 'text-gray-500 hover:text-[#1F1F1F]'
                   }`}
               >
                 Buy
@@ -155,9 +155,9 @@ export default function CategorySection() {
 
               <button
                 onClick={() => setType('rent')}
-                className={`px-4 py-2 rounded-full text-sm ${type === 'rent'
-                    ? 'bg-[#6f4e37] text-white'
-                    : 'bg-gray-100 text-gray-600'
+                className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${type === 'rent'
+                    ? 'bg-[#1F1F1F] text-white shadow-md'
+                    : 'text-gray-500 hover:text-[#1F1F1F]'
                   }`}
               >
                 Rent

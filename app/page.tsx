@@ -10,7 +10,7 @@ import ListCTASection from './home/ListCTASection';
 export default function HomePage() {
 
   return (
-    <main className="bg-[#faf7f3]">
+    <main className="bg-[#F4EFE9]">
       <HeroSection />
 
       <SearchSection />

@@ -113,7 +113,9 @@ export default function HeroSection(): React.ReactNode {
             alt="Hero Background"
             fill
             priority={index === 0}
-            className="object-cover"
+            className={`object-cover transition-transform duration-[10000ms] ease-out ${
+              index === currentImageIndex ? 'scale-110' : 'scale-100'
+            }`}
             sizes="100vw"
             quality={85}
           />
@@ -137,11 +139,11 @@ export default function HeroSection(): React.ReactNode {
                   : 'opacity-0 translate-y-4 pointer-events-none'
               }`}
             >
-              <h1 className="max-w-3xl text-3xl leading-[1.15] font-extrabold sm:text-5xl lg:text-7xl drop-shadow-md whitespace-pre-line sm:leading-tight">
+              <h1 className="max-w-4xl text-4xl leading-[1.1] font-extrabold sm:text-5xl lg:text-7xl drop-shadow-lg whitespace-pre-line sm:leading-tight">
                 {slide.title}
               </h1>
 
-              <p className="mt-4 sm:mt-6 max-w-xl text-sm sm:text-lg md:text-xl text-white/90 drop-shadow-md leading-relaxed">
+              <p className="mt-5 sm:mt-8 max-w-2xl text-base sm:text-lg md:text-xl text-white/90 drop-shadow-md leading-relaxed font-light">
                 {slide.description}
               </p>
             </div>
@@ -149,10 +151,10 @@ export default function HeroSection(): React.ReactNode {
         </div>
 
         {/* Buttons */}
-        <div className="mt-15 sm:mt-10 flex flex-wrap gap-4 relative z-20">
+        <div className="mt-12 flex flex-wrap gap-5 relative z-20">
           <button
             onClick={() => setOpen(true)}
-            className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 font-bold text-[#6f4e37] hover:bg-[#ede3d5]"
+            className="inline-flex items-center gap-2 rounded-2xl bg-white px-8 py-4 font-bold text-[#1F1F1F] shadow-xl hover:bg-[#C9A24D] hover:text-white transition-all duration-300 hover:-translate-y-1"
           >
             Browse Properties
             <ArrowRight className="h-5 w-5" />
@@ -160,7 +162,7 @@ export default function HeroSection(): React.ReactNode {
 
           <Link
             href="/want-to-list"
-            className="inline-flex items-center gap-2 rounded-xl border border-white/40 px-6 py-3 font-bold text-white hover:bg-white/10"
+            className="inline-flex items-center gap-2 rounded-2xl bg-black/40 backdrop-blur-md border border-white/30 px-8 py-4 font-bold text-white hover:bg-white hover:text-[#1F1F1F] transition-all duration-300 hover:-translate-y-1"
           >
             List Your Property
           </Link>
