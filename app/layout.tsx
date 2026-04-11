@@ -11,9 +11,12 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'Cliffton Group | Premium Real Estate',
+  title: 'Cliffton Properties',
   description:
     'Residential, Commercial, Industrial and Land properties for Rent and Sale in Surat.',
+  icons: {
+    icon: '/cliffton_logo.png',
+  },
 };
 
 export const viewport: Viewport = {
