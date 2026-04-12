@@ -31,6 +31,8 @@ type AmenityItem = {
   icon: string;
 };
 
+type AmenitiesMap = Record<string, boolean>;
+
 /* ---------------- AMENITIES MASTER ---------------- */
 
 const AMENITIES: AmenityItem[] = [
@@ -108,16 +110,15 @@ function PropertyCardComponent({
 
   const whatsappLink = `https://wa.me/919999999999?text=Interested in ${title}`;
 
-  /* ---------------- AMENITIES EXTRACTION ---------------- */
+  /* ---------------- SAFE AMENITIES ACCESS ---------------- */
 
-  const amenitiesObject =
-    residential_details?.amenities ||
-    commercial_details?.amenities ||
-    {};
+  const amenitiesObject: AmenitiesMap =
+    (residential_details?.amenities as AmenitiesMap) ||
+    ((commercial_details as { amenities?: AmenitiesMap })?.amenities ?? {});
 
   const activeAmenities = useMemo(() => {
     return AMENITIES.filter(
-      (item) => amenitiesObject?.[item.key] === true
+      (item) => amenitiesObject[item.key] === true
     );
   }, [amenitiesObject]);
 
@@ -153,6 +154,7 @@ function PropertyCardComponent({
           <>
             <button
               onClick={prevImage}
+              type="button"
               className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/40 backdrop-blur-md p-2 rounded-full text-[#2B2B2B] hover:bg-white transition"
             >
               <ChevronLeft size={16} />
@@ -160,6 +162,7 @@ function PropertyCardComponent({
 
             <button
               onClick={nextImage}
+              type="button"
               className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/40 backdrop-blur-md p-2 rounded-full text-[#2B2B2B] hover:bg-white transition"
             >
               <ChevronRight size={16} />
@@ -181,7 +184,10 @@ function PropertyCardComponent({
         </div>
 
         {/* WISHLIST */}
-        <button className="absolute top-4 right-4 bg-white/40 backdrop-blur-md p-2 rounded-full text-[#6B4A3A] hover:bg-white transition">
+        <button
+          type="button"
+          className="absolute top-4 right-4 bg-white/40 backdrop-blur-md p-2 rounded-full text-[#6B4A3A] hover:bg-white transition"
+        >
           <Heart size={16} />
         </button>
 
