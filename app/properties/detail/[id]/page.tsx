@@ -28,20 +28,35 @@ const formatINR = (amount: number) =>
     maximumFractionDigits: 0,
   }).format(amount);
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const renderAmenities = (amenities: any) => {
-  if (!amenities) return null;
-  if (Array.isArray(amenities)) return amenities.join(', ');
-  if (typeof amenities === 'object') {
-    return Object.entries(amenities)
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      .filter(([_, v]) => { 
-        return v === true; 
-      })
-      .map(([k]) => k.replace(/_/g, ' '))
-      .join(', ');
-  }
-  return String(amenities);
+/* ================= AMENITIES CONFIG ================= */
+
+const AMENITIES_CONFIG = {
+  lift: { label: 'Private Lift', icon: '🛗' },
+  gym: { label: 'Smart Gym', icon: '🏋️‍♂️' },
+  garden: { label: 'Zen Garden', icon: '🌳' },
+  security: { label: '24/7 Security', icon: '⚔️' },
+  swimming_pool: { label: 'Swimming Pool', icon: '🏊‍♂️' },
+  club_house: { label: 'Club House', icon: '🏠' },
+  playground: { label: 'Play Area', icon: '🎠' },
+  gas_connection: { label: 'Gas Line', icon: '🔥' },
+  power_backup: { label: 'Power Backup', icon: '⚡' },
+  cctv: { label: 'CCTV', icon: '📹' },
+  intercom: { label: 'Intercom', icon: '📞' },
+  jogging_track: { label: 'Jogging Track', icon: '🏃‍♂️' },
+};
+
+const getActiveAmenities = (amenities: Record<string, boolean>) => {
+  if (!amenities) return [];
+
+  return Object.entries(amenities)
+    .filter(([_, value]) => value === true)
+    .map(([key]) => ({
+      key,
+      label:
+        AMENITIES_CONFIG[key as keyof typeof AMENITIES_CONFIG]?.label || key,
+      icon:
+        AMENITIES_CONFIG[key as keyof typeof AMENITIES_CONFIG]?.icon || '✨',
+    }));
 };
 
 type Props = {
@@ -58,7 +73,7 @@ export default function PropertyDetailPage({ params }: Props) {
   useEffect(() => {
     async function fetchProperty() {
       try {
-        const res = await fetch(`/api/properties/${id}`); 
+        const res = await fetch(`/api/properties/${id}`);
         if (!res.ok) throw new Error('Fetch failed');
         const json = await res.json();
         setProperty(json.data);
@@ -68,6 +83,7 @@ export default function PropertyDetailPage({ params }: Props) {
         setLoading(false);
       }
     }
+
     fetchProperty();
   }, [id]);
 
@@ -126,17 +142,17 @@ export default function PropertyDetailPage({ params }: Props) {
 
       {/* CONTENT GRID */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 mt-10 sm:mt-20 grid grid-cols-1 lg:grid-cols-3 gap-12 lg:items-start">
-        
         {/* LEFT PRIMARY CONTENT */}
         <div className="lg:col-span-2 space-y-12">
-          
           {/* HEADER INFORMATION CARD */}
           <div className="bg-white rounded-[2rem] sm:rounded-[2.5rem] border border-[#E8E2DA] p-6 sm:p-12 shadow-sm">
             <div className="flex flex-col md:flex-row justify-between items-start gap-8">
               <div className="flex-1">
                 <span className="inline-flex items-center gap-2 bg-[#F4EFE9] px-5 py-2 rounded-full text-[11px] font-bold uppercase tracking-widest text-[#C9A24D]">
                   {property.category === 'residential' && <Home size={14} />}
-                  {property.category === 'commercial' && <Building2 size={14} />}
+                  {property.category === 'commercial' && (
+                    <Building2 size={14} />
+                  )}
                   {property.category === 'land' && <LandPlot size={14} />}
                   {property.category}
                 </span>
@@ -158,20 +174,34 @@ export default function PropertyDetailPage({ params }: Props) {
                   {formatINR(property.price)}
                 </p>
                 <p className="text-xs sm:text-sm text-[#6B6B6B] mt-2 font-bold uppercase tracking-widest">
-                  {property.listing_type === 'rent' ? 'Per Month' : 'Total Price'}
+                  {property.listing_type === 'rent'
+                    ? 'Per Month'
+                    : 'Total Price'}
                 </p>
               </div>
             </div>
 
-            {/* QUICK STATS INFOGRAPHIC */}
+            {/* QUICK STATS */}
             <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <Stat label="Total Area" value={`${areaValue} ${areaUnit}`} icon={<Ruler size={18} />} />
-              <Stat label="Listing" value={property.listing_type} icon={<Tag size={18} />} />
-              <Stat label="ID Number" value={property.property_code} icon={<Key size={18} />} />
+              <Stat
+                label="Total Area"
+                value={`${areaValue} ${areaUnit}`}
+                icon={<Ruler size={18} />}
+              />
+              <Stat
+                label="Listing"
+                value={property.listing_type}
+                icon={<Tag size={18} />}
+              />
+              <Stat
+                label="ID Number"
+                value={property.property_code}
+                icon={<Key size={18} />}
+              />
             </div>
           </div>
 
-          {/* PROPERTY DESCRIPTION */}
+          {/* DESCRIPTION */}
           <Section title="Overview & Narrative">
             <p className="text-base sm:text-lg leading-relaxed text-[#4A4A4A] whitespace-pre-line font-medium italic opacity-90">
               {property.description}
@@ -180,63 +210,123 @@ export default function PropertyDetailPage({ params }: Props) {
             <div className="mt-12 pt-8 border-t border-[#F4EFE9] flex flex-col sm:flex-row justify-between gap-6 text-sm text-[#6B6B6B] font-semibold tracking-wide">
               <div className="flex flex-col sm:flex-row gap-6">
                 <div className="flex items-center gap-2 uppercase">
-                  <Clock size={16} /> Modified: {new Date(property.updated_at).toLocaleDateString('en-IN')}
+                  <Clock size={16} />
+                  Modified:{' '}
+                  {new Date(property.updated_at).toLocaleDateString('en-IN')}
                 </div>
                 <div className="flex items-center gap-2 uppercase">
-                  <Calendar size={16} /> Created: {new Date(property.created_at).toLocaleDateString('en-IN')}
+                  <Calendar size={16} />
+                  Created:{' '}
+                  {new Date(property.created_at).toLocaleDateString('en-IN')}
                 </div>
               </div>
 
               <p className="uppercase">
-                Availability: <span className="text-[#1F1F1F]">{property.possession_date || 'Ready Move'}</span>
+                Availability:{' '}
+                <span className="text-[#1F1F1F]">
+                  {property.possession_date || 'Ready Move'}
+                </span>
               </p>
             </div>
           </Section>
 
-          {/* DETAILED FEATURES */}
+          {/* TECHNICAL SPECIFICATIONS */}
           <Section title="Technical Specifications">
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              {/* Maps through detail tables dynamically as before, styles already updated in sub-components */}
               {resi && (
                 <>
-                  <Spec label="BHK Configuration" value={resi.property_subtype} />
+                  <Spec
+                    label="BHK Configuration"
+                    value={resi.property_subtype}
+                  />
                   <Spec label="Bedrooms" value={resi.bedrooms} />
                   <Spec label="Bathrooms" value={resi.bathrooms} />
                   <Spec label="Balconies" value={resi.balconies} />
-                  <Spec label="Built-up Area" value={`${resi.built_up_area} sqft`} />
-                  <Spec label="Carpet Area" value={`${resi.carpet_area} sqft`} />
-                  <Spec label="Maintenance" value={resi.maintenance_charges} />
-                  <Spec label="Furnishing" value={resi.furnishing_type} />
+                  <Spec
+                    label="Built-up Area"
+                    value={`${resi.built_up_area} sqft`}
+                  />
+                  <Spec
+                    label="Carpet Area"
+                    value={`${resi.carpet_area} sqft`}
+                  />
+                  <Spec
+                    label="Maintenance"
+                    value={resi.maintenance_charges}
+                  />
+                  <Spec
+                    label="Furnishing"
+                    value={resi.furnishing_type}
+                  />
                   <Spec label="Floor Level" value={resi.floor} />
-                  <Spec label="Car Spaces" value={resi.parking_spaces} />
-                  <Spec label="Age of Prop" value={resi.property_age} />
-                  {resi.amenities && <Spec label="Amenities" value={renderAmenities(resi.amenities)} />}
+                  <Spec
+                    label="Car Spaces"
+                    value={resi.parking_spaces}
+                  />
+                  <Spec
+                    label="Age of Property"
+                    value={resi.property_age}
+                  />
+
+                  {/* CREATIVE AMENITIES GRID */}
+                  {resi.amenities && (
+                    <div className="col-span-2 lg:col-span-3 mt-4">
+                      <h3 className="text-xl font-semibold mb-6">
+                        Luxury Amenities
+                      </h3>
+                      <AmenitiesGrid amenities={resi.amenities} />
+                    </div>
+                  )}
                 </>
               )}
-              {/* Comm and Land details follow same pattern */}
+
               {comm && (
                 <>
-                  <Spec label="Structure" value={comm.commercial_subtype} />
+                  <Spec
+                    label="Structure"
+                    value={comm.commercial_subtype}
+                  />
                   <Spec label="Floor" value={comm.floor} />
                   <Spec label="Washrooms" value={comm.washrooms} />
-                  <Spec label="Built Area" value={`${comm.built_up_area} sqft`} />
-                  <Spec label="Service AC" value={comm.central_air_conditioning ? 'Yes' : 'No'} />
-                  <Spec label="Frontage" value={comm.frontage_width} />
+                  <Spec
+                    label="Built Area"
+                    value={`${comm.built_up_area} sqft`}
+                  />
+                  <Spec
+                    label="Service AC"
+                    value={
+                      comm.central_air_conditioning ? 'Yes' : 'No'
+                    }
+                  />
+                  <Spec
+                    label="Frontage"
+                    value={comm.frontage_width}
+                  />
                 </>
               )}
+
               {land && (
                 <>
                   <Spec label="Zoning" value={land.land_zoning} />
-                  <Spec label="Plot Size" value={`${land.plot_area} ${areaUnit}`} />
-                  <Spec label="Corner Plot" value={land.corner_plot ? 'Yes' : 'No'} />
-                  <Spec label="Boundary" value={land.boundary_wall ? 'Yes' : 'No'} />
+                  <Spec
+                    label="Plot Size"
+                    value={`${land.plot_area} ${areaUnit}`}
+                  />
+                  <Spec
+                    label="Corner Plot"
+                    value={land.corner_plot ? 'Yes' : 'No'}
+                  />
+                  <Spec
+                    label="Boundary"
+                    value={land.boundary_wall ? 'Yes' : 'No'}
+                  />
                 </>
               )}
             </div>
           </Section>
         </div>
 
-        {/* RIGHT SIDEBAR - STICKY DESKTOP */}
+        {/* SIDEBAR */}
         <aside className="relative">
           <div className="sticky top-28 space-y-8">
             <div className="bg-[#1F1F1F] rounded-[2.5rem] p-10 text-white shadow-2xl">
@@ -249,7 +339,7 @@ export default function PropertyDetailPage({ params }: Props) {
                   <PhoneCall size={18} /> Call Advisor
                 </button>
 
-                <a 
+                <a
                   href={`https://wa.me/919999999999?text=Inquiry for ${property.title}`}
                   target="_blank"
                   className="w-full border-2 border-white/20 py-5 rounded-2xl font-bold uppercase tracking-widest text-sm hover:bg-white/10 transition-all flex items-center justify-center gap-3"
@@ -257,10 +347,6 @@ export default function PropertyDetailPage({ params }: Props) {
                   <Users size={18} /> WhatsApp
                 </a>
               </div>
-              
-              <p className="mt-8 text-[10px] text-white/50 uppercase tracking-[0.2em] text-center font-bold">
-                Professionalism Guaranteed
-              </p>
             </div>
 
             {property.verified && (
@@ -269,7 +355,9 @@ export default function PropertyDetailPage({ params }: Props) {
                   <ShieldCheck size={28} />
                 </div>
                 <div>
-                  <p className="text-sm font-bold uppercase tracking-widest">Verified Listing</p>
+                  <p className="text-sm font-bold uppercase tracking-widest">
+                    Verified Listing
+                  </p>
                   <p className="text-xs text-[#6B6B6B] mt-1 font-medium italic">
                     Certified details and ownership.
                   </p>
@@ -279,28 +367,19 @@ export default function PropertyDetailPage({ params }: Props) {
           </div>
         </aside>
       </section>
-
-      {/* STICKY MOBILE CTA */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-[100] p-4 bg-white/80 backdrop-blur-xl border-t border-[#E8E2DA] flex gap-3 shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
-        <button className="flex-1 bg-[#1F1F1F] text-white py-4 rounded-2xl font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-2">
-          <PhoneCall size={16} /> Call Now
-        </button>
-        <a 
-          href={`https://wa.me/919999999999?text=Inquiry for ${property.title}`}
-          target="_blank"
-          className="flex-1 bg-[#25D366] text-white py-4 rounded-2xl font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-2"
-        >
-           WhatsApp
-        </a>
-      </div>
     </main>
   );
 }
 
-/* UI */
+/* ================= UI COMPONENTS ================= */
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function Section({ title, children }: any) {
+function Section({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="bg-white rounded-3xl border border-[#E8E2DA] p-8">
       <h2 className="text-xl font-semibold mb-6">{title}</h2>
@@ -309,8 +388,15 @@ function Section({ title, children }: any) {
   );
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function Stat({ label, value, icon }: any) {
+function Stat({
+  label,
+  value,
+  icon,
+}: {
+  label: string;
+  value: string;
+  icon: React.ReactNode;
+}) {
   return (
     <div className="flex items-center gap-3 bg-[#F4EFE9] px-4 py-3 rounded-xl">
       {icon}
@@ -322,15 +408,56 @@ function Stat({ label, value, icon }: any) {
   );
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function Spec({ label, value }: any) {
+function Spec({
+  label,
+  value,
+}: {
+  label: string;
+  value: unknown;
+}) {
   if (!value) return null;
+
   return (
     <div className="bg-[#F4EFE9] p-4 rounded-xl">
       <p className="text-xs text-[#6B6B6B] mb-1">{label}</p>
       <p className="text-sm font-medium capitalize">
-        {typeof value === 'string' ? value.replace(/_/g, ' ') : value.toString()}
+        {typeof value === 'string'
+          ? value.replace(/_/g, ' ')
+          : value.toString()}
       </p>
+    </div>
+  );
+}
+
+/* ================= AMENITIES GRID ================= */
+
+function AmenitiesGrid({
+  amenities,
+}: {
+  amenities: Record<string, boolean>;
+}) {
+  const activeAmenities = getActiveAmenities(amenities);
+
+  if (!activeAmenities.length) return null;
+
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+      {activeAmenities.map((item) => (
+        <div
+          key={item.key}
+          className="group bg-gradient-to-br from-white to-[#F4EFE9] border border-[#E8E2DA] rounded-2xl p-5 hover:shadow-xl hover:scale-[1.02] transition-all duration-300"
+        >
+          <div className="flex flex-col items-center text-center gap-3">
+            <div className="w-14 h-14 rounded-2xl bg-[#C9A24D]/10 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform duration-300">
+              {item.icon}
+            </div>
+
+            <p className="text-sm font-semibold text-[#1F1F1F] leading-snug">
+              {item.label}
+            </p>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
